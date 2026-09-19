@@ -11,6 +11,9 @@
  */
 
 package com.davidtakac.bura.graphs
+import com.davidtakac.bura.graphs.wind.compose.WindGraph
+import com.davidtakac.bura.graphs.wind.WindGraph
+import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -67,6 +70,8 @@ fun EssentialGraphPage(
     temperatureArgs: GraphArgs,
     popGraph: PopGraph,
     popArgs: GraphArgs,
+    windGraph: WindGraph,
+    windMax: WindSpeed,
     precipGraph: PrecipitationGraph,
     precipArgs: GraphArgs,
     precipMax: MixedPrecipitation,
@@ -103,7 +108,9 @@ fun EssentialGraphPage(
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
-                GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
+                GraphScreenSectionLabel(stringResource(R.string.cond_screen_wind))
+WindGraph(state = windGraph, max = windMax, modifier = Modifier.fillMaxWidth().aspectRatio(graphAspectRatio).border(width = Dp.Hairline, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.onSurfaceVariant).clip(MaterialTheme.shapes.large))
+GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
                 PopGraph(
                     state = popGraph,
                     args = popArgs,

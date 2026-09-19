@@ -11,6 +11,8 @@
  */
 
 package com.davidtakac.bura.graphs
+import com.davidtakac.bura.graphs.wind.getWindGraphs
+import com.davidtakac.bura.graphs.wind.WindGraphs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -94,12 +96,14 @@ class EssentialGraphsViewModel(
             precipPeriod = forecast.precipitation
         ) ?: return EssentialGraphsState.Outdated
 
+        val windGraphs = getWindGraphs(now = now, windPeriod = forecast.wind) ?: return EssentialGraphsState.Outdated
         return EssentialGraphsState.Success(
             tempGraphSummaries = tempGraphSummaries,
             tempGraphs = tempGraphs,
             popGraphs = popGraphs,
             precipGraphs = precipGraphs,
-            precipTotals = precipTotals
+            precipTotals = precipTotals,
+            windGraphs = windGraphs
         )
     }
 
@@ -125,7 +129,8 @@ sealed interface EssentialGraphsState {
         val tempGraphs: TemperatureGraphs,
         val popGraphs: List<PopGraph>,
         val precipGraphs: PrecipitationGraphs,
-        val precipTotals: List<PrecipitationTotal>
+        val precipTotals: List<PrecipitationTotal>,
+        val windGraphs: WindGraphs
     ) : EssentialGraphsState
 
     data object Loading : EssentialGraphsState

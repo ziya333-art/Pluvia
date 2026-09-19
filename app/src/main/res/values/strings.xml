@@ -236,4 +236,5 @@
     <string name="wmo_95">Thunderstorm</string>
     <string name="wmo_96">Thunderstorm with light hail</string>
     <string name="wmo_99">Thunderstorm with heavy hail</string>
+    <string name="cond_screen_wind">Wind</string>
 </resources>
