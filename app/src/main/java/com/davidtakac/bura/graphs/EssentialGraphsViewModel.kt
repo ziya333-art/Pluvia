@@ -11,6 +11,8 @@
  */
 
 package com.davidtakac.bura.graphs
+import com.davidtakac.bura.graphs.uvindex.getUvIndexGraphs
+import com.davidtakac.bura.graphs.uvindex.UvIndexGraphs
 import com.davidtakac.bura.graphs.wind.getWindGraphs
 import com.davidtakac.bura.graphs.wind.WindGraphs
 
@@ -97,13 +99,15 @@ class EssentialGraphsViewModel(
         ) ?: return EssentialGraphsState.Outdated
 
         val windGraphs = getWindGraphs(now = now, windPeriod = forecast.wind) ?: return EssentialGraphsState.Outdated
+        val uvIndexGraphs = getUvIndexGraphs(now = now, uvIndexPeriod = forecast.uvIndex) ?: return EssentialGraphsState.Outdated
         return EssentialGraphsState.Success(
             tempGraphSummaries = tempGraphSummaries,
             tempGraphs = tempGraphs,
             popGraphs = popGraphs,
             precipGraphs = precipGraphs,
             precipTotals = precipTotals,
-            windGraphs = windGraphs
+            windGraphs = windGraphs,
+            uvIndexGraphs = uvIndexGraphs
         )
     }
 
@@ -130,7 +134,8 @@ sealed interface EssentialGraphsState {
         val popGraphs: List<PopGraph>,
         val precipGraphs: PrecipitationGraphs,
         val precipTotals: List<PrecipitationTotal>,
-        val windGraphs: WindGraphs
+        val windGraphs: WindGraphs,
+        val uvIndexGraphs: UvIndexGraphs
     ) : EssentialGraphsState
 
     data object Loading : EssentialGraphsState

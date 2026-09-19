@@ -10,9 +10,9 @@
  * You should have received a copy of the GNU General Public License along with Bura. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.davidtakac.bura.graphs.wind.compose
-import com.davidtakac.bura.forecast.parameters.wind.string
-import com.davidtakac.bura.forecast.parameters.wind.bftString
+package com.davidtakac.bura.graphs.uvindex.compose
+import com.davidtakac.bura.forecast.parameters.uvindex.valueString
+import com.davidtakac.bura.forecast.parameters.uvindex.riskString
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -42,16 +42,16 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidtakac.bura.graphs.common.GraphArgs
-import com.davidtakac.bura.graphs.wind.WindGraph
-import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
+import com.davidtakac.bura.graphs.uvindex.UvIndexGraph
+import com.davidtakac.bura.forecast.parameters.uvindex.UvIndex
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
 @Composable
-fun WindGraph(
-    state: WindGraph,
-    max: WindSpeed,
+fun UvIndexGraph(
+    state: UvIndexGraph,
+    max: UvIndex,
 
 
     modifier: Modifier = Modifier
@@ -76,8 +76,8 @@ fun WindGraph(
     val linePath = remember { Path() }
     val fillPath = remember { Path() }
     var selectedIndex by remember(state) { mutableStateOf(-1) }
-    val maxIdx = points.indices.maxByOrNull { points[it].speed.value } ?: 0
-    val maxLabelText = points[maxIdx].speed.string()
+    val maxIdx = points.indices.maxByOrNull { points[it].uvIndex.value } ?: 0
+    val maxLabelText = points[maxIdx].uvIndex.valueString()
 
     Column(modifier = modifier.padding(10.dp)) {
         Canvas(
@@ -102,13 +102,13 @@ fun WindGraph(
             val step =
                 if (points.size > 1) size.width / (points.size - 1) else 0f
             fun x(i: Int) = i * step
-            fun y(speed: WindSpeed) = axisTop + plotH - (speed.value / maxVal * plotH).toFloat()
+            fun y(uvIndex: UvIndex) = axisTop + plotH - (uvIndex.value / maxVal * plotH).toFloat()
 
             linePath.reset()
             fillPath.reset()
             points.forEachIndexed { i, p ->
                 val px = x(i)
-                val py = y(p.speed)
+                val py = y(p.uvIndex)
                 if (i == 0) linePath.moveTo(px, py) else linePath.lineTo(px, py)
             }
             fillPath.addPath(linePath)
@@ -135,7 +135,7 @@ fun WindGraph(
                 )
             }
             points.forEachIndexed { i, p ->
-                drawCircle(color = primary, radius = 2.5.dp.toPx(), center = Offset(x(i), y(p.speed)))
+                drawCircle(color = primary, radius = 2.5.dp.toPx(), center = Offset(x(i), y(p.uvIndex)))
                 if (p.datetime.hour % 6 == 0) {
                     drawText(
                         textMeasurer = measurer,
@@ -145,7 +145,7 @@ fun WindGraph(
                     )
                 }
             }
-            val maxIdx = points.indices.maxByOrNull { points[it].speed.value } ?: 0
+            val maxIdx = points.indices.maxByOrNull { points[it].uvIndex.value } ?: 0
             val maxLabel = measurer.measure(
                 maxLabelText,
                 TextStyle(fontSize = 10.sp, color = onSurfaceVariant)
@@ -154,7 +154,7 @@ fun WindGraph(
                 textLayoutResult = maxLabel,
                 topLeft = Offset(
                     x(maxIdx) - maxLabel.size.width / 2f,
-                    y(points[maxIdx].speed) - maxLabel.size.height - 4.dp.toPx()
+                    y(points[maxIdx].uvIndex) - maxLabel.size.height - 4.dp.toPx()
                 )
             )
         }
@@ -164,8 +164,8 @@ fun WindGraph(
         val shown = points[shownIdx]
         Text(
             text = shown.datetime.format(timeFormatter) +
-                " · " + shown.speed.string() +
-                " · " + shown.speed.bftString(),
+                " · " + shown.uvIndex.valueString() +
+                " · " + shown.uvIndex.riskString(),
             style = MaterialTheme.typography.labelMedium,
             color = onSurfaceVariant,
             modifier = Modifier
