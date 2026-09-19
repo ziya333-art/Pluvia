@@ -1,0 +1,1 @@
+Added Wind and UV Index graphs to the conditions screen.
