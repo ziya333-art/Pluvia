@@ -14,7 +14,7 @@
        - T. Zawiślak (ed.). "Słownik tematyczny terminów, wyrażeń i zwrotów stosowanych w prognozach meteorologicznych". IMGW, Warszawa, 2010. <https://bip.lodzkie.eu/data/other/slownik_meteo.pdf>
        - IMGW-PIB. "Słownik meteorologiczny dla mediów". IMGW-PIB, Warszawa, 2024. <https://www.imgw.pl/sites/default/files/2024-01/slownik-meteorologiczny-imgw-dla-mediow.pdf>
     -->
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Nie udało się pobrać pogody. Połącz się z internetem.</string>
     <string name="general_error_outdated">Dane prognozy wygasły. Spróbuj ponownie.</string>
     <string name="general_error_no_selected_place">Brak wybranego miejsca.</string>

@@ -11,7 +11,7 @@
   -->
 
 <resources>
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Downloaden van weersvoorspelling mislukt. Maak verbinding met het internet en probeer het opnieuw.</string>
     <string name="general_error_outdated">De gegevens van uw weersvoorspelling zijn verouderd. Maak verbinding met het internet en probeer het opnieuw.</string>
     <string name="general_error_no_selected_place">Geen locatie gekozen.</string>

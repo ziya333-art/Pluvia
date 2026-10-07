@@ -11,7 +11,7 @@
   -->
 
 <resources>
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Не удалось загрузить прогноз. Подключитесь к сети.</string>
     <string name="general_error_outdated">Прогноз устарел. Подключитесь к сети.</string>
     <string name="general_error_no_selected_place">Не выбрано место.</string>

@@ -1,3 +1,4 @@
+import java.util.Properties
 /*
  * Copyright 2024 David Takač
  *
@@ -48,11 +49,23 @@ android {
         )
     }
 
+    signingConfigs {
+        create("release") {
+            val keystoreProperties = Properties()
+            rootProject.file("keystore.properties").inputStream().use { keystoreProperties.load(it) }
+            storeFile = file(keystoreProperties.getProperty("storeFile"))
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles(

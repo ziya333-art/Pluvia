@@ -11,7 +11,7 @@
   -->
 
 <resources>
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Nepodařilo se stáhnout předpověď. Připojte se k internetu a zkuste to znovu.</string>
     <string name="general_error_outdated">Vaše data předpovědi vypršela. Připojte se k internetu a zkuste to znovu.</string>
     <string name="general_error_no_selected_place">Není vybráno žádné místo.</string>

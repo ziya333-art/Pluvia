@@ -11,7 +11,7 @@
   -->
 
 <resources>
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Herunterladen der Vorhersage fehlgeschlagen. Stellen Sie eine Internetverbindung her und versuchen Sie es erneut.</string>
     <string name="general_error_outdated">Ihre Vorhersagedaten sind abgelaufen. Verbinden Sie sich mit dem Internet und versuchen Sie es erneut.</string>
     <string name="general_error_no_selected_place">Kein Ort ausgewählt.</string>

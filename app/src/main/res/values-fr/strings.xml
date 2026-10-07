@@ -11,7 +11,7 @@
   -->
 
 <resources>
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Échec de téléchargement des prévisions. Connectez-vous à Internet et réessayez.</string>
     <string name="general_error_outdated">Vos données de prévisions sont obsolètes. Connectez-vous à Internet et réessayez.</string>
     <string name="general_error_no_selected_place">Aucun emplacement sélectionné.</string>

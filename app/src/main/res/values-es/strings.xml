@@ -15,7 +15,7 @@
 ]>
 
 <resources>
-    <string name="app_name">Bura</string>
+    <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Falló la descarga del pronóstico. Conéctate a Internet e inténtalo de nuevo.</string>
     <string name="general_error_outdated">Tus datos de pronóstico han expirado. Conéctate a Internet e inténtalo de nuevo.</string>
     <string name="general_error_no_selected_place">No se ha seleccionado ningún lugar.</string>
