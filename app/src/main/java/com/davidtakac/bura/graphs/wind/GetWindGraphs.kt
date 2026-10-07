@@ -13,32 +13,32 @@
 package com.davidtakac.bura.graphs.wind
 
 import com.davidtakac.bura.forecast.parameters.wind.WindDirection
-import com.davidtakac.bura.forecast.HourPeriod
 import com.davidtakac.bura.forecast.parameters.wind.WindMoment
 import com.davidtakac.bura.forecast.parameters.wind.WindPeriod
 import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
-fun getWindGraphs(now: LocalDateTime, windPeriod: WindPeriod): WindGraphs? {
-    val windDays = windPeriod.daysFrom(now.toLocalDate()) ?: return null
+fun getWindGraphs(now: ZonedDateTime, windPeriod: WindPeriod): WindGraphs? {
+    val windDays = windPeriod.dayMomentsFrom(now.toLocalDate()) ?: return null
+    val windGraphPeriods = windDays.map { WindPeriod(it) }
     return WindGraphs(
         max = windPeriod.maximumSpeed,
-        graphs = windDays.mapIndexed { idx, windDay ->
-            getWindGraph(windDay, windDays.getOrNull(idx + 1))
+        graphs = windGraphPeriods.mapIndexed { idx, windDay ->
+            getWindGraph(windDay, windGraphPeriods.getOrNull(idx + 1))
         }
     )
 }
 
-private fun getWindGraph(windDay: HourPeriod<WindMoment>, windTomorrow: HourPeriod<WindMoment>?): WindGraph {
+private fun getWindGraph(windDay: WindPeriod, windTomorrow: WindPeriod?): WindGraph {
     val adjusted =
         if (windTomorrow != null) WindPeriod(windDay + windTomorrow.first())
         else windDay
     return WindGraph(
-        day = windDay.first().hour.toLocalDate(),
+        day = windDay.first().timeZdt.toLocalDate(),
         points = adjusted.map { moment ->
             WindGraphPoint(
-                datetime = moment.hour,
+                datetime = moment.timeZdt,
                 speed = moment.wind.speed,
                 from = moment.wind.from
             )
@@ -49,7 +49,7 @@ private fun getWindGraph(windDay: HourPeriod<WindMoment>, windTomorrow: HourPeri
 data class WindGraphs(val graphs: List<WindGraph>, val max: WindSpeed)
 data class WindGraph(val day: LocalDate, val points: List<WindGraphPoint>)
 data class WindGraphPoint(
-    val datetime: LocalDateTime,
+    val datetime: ZonedDateTime,
     val speed: WindSpeed,
     val from: WindDirection
 )

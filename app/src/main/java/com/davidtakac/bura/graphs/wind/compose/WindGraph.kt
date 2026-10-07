@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.davidtakac.bura.graphs.common.GraphArgs
 import com.davidtakac.bura.graphs.wind.WindGraph
 import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
@@ -68,7 +68,7 @@ fun WindGraph(
         return
     }
     val points = state.points
-    val now = remember { LocalDateTime.now() }
+    val now = remember { ZonedDateTime.now() }
     val primary = MaterialTheme.colorScheme.primary
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val timeFormatter = remember { DateTimeFormatter.ofPattern("HH:mm") }

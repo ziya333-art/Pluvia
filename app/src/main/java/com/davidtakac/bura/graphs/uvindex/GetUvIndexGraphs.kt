@@ -12,32 +12,32 @@
 
 package com.davidtakac.bura.graphs.uvindex
 
-import com.davidtakac.bura.forecast.HourPeriod
 import com.davidtakac.bura.forecast.parameters.uvindex.UvIndexMoment
 import com.davidtakac.bura.forecast.parameters.uvindex.UvIndexPeriod
 import com.davidtakac.bura.forecast.parameters.uvindex.UvIndex
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
-fun getUvIndexGraphs(now: LocalDateTime, uvIndexPeriod: UvIndexPeriod): UvIndexGraphs? {
-    val uvDays = uvIndexPeriod.daysFrom(now.toLocalDate()) ?: return null
+fun getUvIndexGraphs(now: ZonedDateTime, uvIndexPeriod: UvIndexPeriod): UvIndexGraphs? {
+    val uvDays = uvIndexPeriod.dayMomentsFrom(now.toLocalDate()) ?: return null
+    val uvGraphPeriods = uvDays.map { UvIndexPeriod(it) }
     return UvIndexGraphs(
         max = uvIndexPeriod.maximum,
-        graphs = uvDays.mapIndexed { idx, uvDay ->
-            getUvIndexGraph(uvDay, uvDays.getOrNull(idx + 1))
+        graphs = uvGraphPeriods.mapIndexed { idx, uvDay ->
+            getUvIndexGraph(uvDay, uvGraphPeriods.getOrNull(idx + 1))
         }
     )
 }
 
-private fun getUvIndexGraph(uvDay: HourPeriod<UvIndexMoment>, uvTomorrow: HourPeriod<UvIndexMoment>?): UvIndexGraph {
+private fun getUvIndexGraph(uvDay: UvIndexPeriod, uvTomorrow: UvIndexPeriod?): UvIndexGraph {
     val adjusted =
         if (uvTomorrow != null) UvIndexPeriod(uvDay + uvTomorrow.first())
         else uvDay
     return UvIndexGraph(
-        day = uvDay.first().hour.toLocalDate(),
+        day = uvDay.first().timeZdt.toLocalDate(),
         points = adjusted.map { moment ->
             UvIndexGraphPoint(
-                datetime = moment.hour,
+                datetime = moment.timeZdt,
                 uvIndex = moment.uvIndex,
             )
         }
@@ -47,6 +47,6 @@ private fun getUvIndexGraph(uvDay: HourPeriod<UvIndexMoment>, uvTomorrow: HourPe
 data class UvIndexGraphs(val graphs: List<UvIndexGraph>, val max: UvIndex)
 data class UvIndexGraph(val day: LocalDate, val points: List<UvIndexGraphPoint>)
 data class UvIndexGraphPoint(
-    val datetime: LocalDateTime,
+    val datetime: ZonedDateTime,
     val uvIndex: UvIndex,
 )

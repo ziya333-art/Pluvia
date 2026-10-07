@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.davidtakac.bura.graphs.common.GraphArgs
 import com.davidtakac.bura.graphs.uvindex.UvIndexGraph
 import com.davidtakac.bura.forecast.parameters.uvindex.UvIndex
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
@@ -68,7 +68,7 @@ fun UvIndexGraph(
         return
     }
     val points = state.points
-    val now = remember { LocalDateTime.now() }
+    val now = remember { ZonedDateTime.now() }
     val primary = MaterialTheme.colorScheme.primary
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val timeFormatter = remember { DateTimeFormatter.ofPattern("HH:mm") }
@@ -98,7 +98,7 @@ fun UvIndexGraph(
             val axisBottom = 18.dp.toPx()
             val plotH = size.height - axisTop - axisBottom
             if (plotH <= 0f) return@Canvas
-            val maxVal = max.value.takeIf { it > 0.0 } ?: 1.0
+            val maxVal = max.value.takeIf { it > 0 }?.toDouble() ?: 1.0
             val step =
                 if (points.size > 1) size.width / (points.size - 1) else 0f
             fun x(i: Int) = i * step
