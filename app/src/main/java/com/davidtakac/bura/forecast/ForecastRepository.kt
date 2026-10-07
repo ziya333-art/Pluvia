@@ -14,8 +14,10 @@ package com.davidtakac.bura.forecast
 
 import com.davidtakac.bura.forecast.cache.ForecastCacher
 import com.davidtakac.bura.forecast.download.ForecastDownloader
+import com.davidtakac.bura.forecast.download.InternetChecker
 import com.davidtakac.bura.places.Coordinates
 import com.davidtakac.bura.forecast.units.Units
+import com.davidtakac.bura.places.Location
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.Duration
@@ -23,41 +25,43 @@ import java.time.Instant
 
 class ForecastRepository(
     private val cacher: ForecastCacher,
-    private val downloader: ForecastDownloader
+    private val downloader: ForecastDownloader,
+    private val internetChecker: InternetChecker
 ) {
     private val coordsToMutex = mutableMapOf<Coordinates, Mutex>()
 
     suspend fun get(
-        coords: Coordinates,
+        location: Location,
         units: Units,
-        updatePolicy: UpdatePolicy = UpdatePolicy.Eager
+        updateFrequency: UpdateFrequency = UpdateFrequency.App
     ): Forecast? =
-        coordsToMutex.getOrPut(coords, defaultValue = { Mutex() }).withLock {
-            val cached = cacher.get(coords)
-            if (cached == null || shouldUpdate(cached.timestamp, updatePolicy)) {
-                val downloaded = downloader.get(coords)
-                if (downloaded == null) {
-                    cached
-                } else {
-                    cacher.save(coords, downloaded)
+        coordsToMutex.getOrPut(location.coordinates, defaultValue = { Mutex() }).withLock {
+            val cached = cacher.get(location.coordinates)
+            if (shouldUpdate(cached, updateFrequency)) {
+                val downloaded = downloader.get(location)
+                if (downloaded != null) {
+                    cacher.save(location.coordinates, downloaded)
                     downloaded
+                } else {
+                    cached
                 }
             } else {
                 cached
             }
         }?.convertTo(units)
 
-    private fun shouldUpdate(timestamp: Instant, updatePolicy: UpdatePolicy): Boolean =
-        if (updatePolicy == UpdatePolicy.Static) {
-            false
-        } else {
-            Duration.between(
-                timestamp,
-                Instant.now()
-            ) >= Duration.ofHours(if (updatePolicy == UpdatePolicy.Eager) 1 else 6)
-        }
+    private fun shouldUpdate(cached: Forecast?, updateFrequency: UpdateFrequency): Boolean {
+        val expiresAfter = updateFrequency.expiresAfter ?: return false
+        val shouldUpdate = cached == null
+                || Duration.between(
+                        cached.timestamp,
+                        Instant.now()
+                ) >= expiresAfter
+        return shouldUpdate && internetChecker.hasInternet()
+    }
 }
 
-enum class UpdatePolicy {
-    Eager, Frugal, Static
+enum class UpdateFrequency(val expiresAfter: Duration?) {
+    App(expiresAfter = Duration.ofHours(1)),
+    Never(expiresAfter = null)
 }

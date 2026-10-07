@@ -13,26 +13,15 @@
 package com.davidtakac.bura.forecast.parameters.pop
 
 import com.davidtakac.bura.forecast.HourPeriod
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class PopPeriod(moments: List<PopMoment>) : HourPeriod<PopMoment>(moments) {
     val maximum get() = maxOf { it.pop }
-    val once: Pop get() {
-        val firstPop = first().pop
-        if (size == 1) return firstPop
 
-        var probNone = 1 - (firstPop.value / 100)
-        for (i in 1..lastIndex) {
-            probNone *= 1 - (get(i).pop.value / 100)
-        }
-        val probOnce = 1 - probNone
-        return Pop(value = probOnce * 100)
-    }
+    fun periodFrom(hourInclusive: Instant, take: Int? = null) =
+        momentsFrom(hourInclusive, take)?.let { PopPeriod(it) }
 
-    override fun momentsFrom(hourInclusive: LocalDateTime, takeMoments: Int?) =
-        super.momentsFrom(hourInclusive, takeMoments)?.let { PopPeriod(it) }
-
-    override fun daysFrom(dayInclusive: LocalDate, takeDays: Int?) =
-        super.daysFrom(dayInclusive, takeDays)?.map { PopPeriod(it) }
+    fun dayPeriodsFrom(dayInclusive: LocalDate, take: Int? = null) =
+        dayMomentsFrom(dayInclusive, take)?.map { PopPeriod(it) }
 }

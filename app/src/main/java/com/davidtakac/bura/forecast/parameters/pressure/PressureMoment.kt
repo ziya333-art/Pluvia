@@ -12,21 +12,21 @@
 
 package com.davidtakac.bura.forecast.parameters.pressure
 
-import com.davidtakac.bura.forecast.HourMoment
-import java.time.LocalDateTime
+import com.davidtakac.bura.forecast.Moment
+import java.time.ZonedDateTime
 import java.util.Objects
 
 class PressureMoment(
-    hour: LocalDateTime,
+    timeZdt: ZonedDateTime,
     val pressure: Pressure
-) : HourMoment(hour) {
-    override fun toString(): String = "$hour: $pressure"
+) : Moment(timeZdt) {
+    override fun toString(): String = "$timeZdt: $pressure"
 
     override fun equals(other: Any?): Boolean =
         other is PressureMoment
-                && other.hour == hour
+                && other.timeZdt == timeZdt
                 && other.pressure == pressure
 
     override fun hashCode(): Int =
-        Objects.hash(hour, pressure)
+        Objects.hash(timeZdt, pressure)
 }

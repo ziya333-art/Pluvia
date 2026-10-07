@@ -14,22 +14,25 @@ package com.davidtakac.bura.graphs.common.drawing
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.LayoutDirection
 import com.davidtakac.bura.graphs.common.GraphArgs
+import com.davidtakac.bura.graphs.common.MeasuredTickLabel
+import com.davidtakac.bura.graphs.common.ValueTick
+import com.davidtakac.bura.graphs.common.VerticalAxisDrawLater
 
-fun <T> DrawScope.drawVerticalAxis(
-    steps: List<T>,
+fun DrawScope.drawVerticalAxis(
+    valueTicks: List<ValueTick>,
     args: GraphArgs,
-    measurer: TextMeasurer,
-    stepFormatter: (step: T) -> String?,
-) {
+    valueFormatter: (Double) -> String?,
+): VerticalAxisDrawLater {
     val lineX =
         if (layoutDirection == LayoutDirection.Ltr) size.width - args.endGutter
         else args.endGutter
-    for (i in 0..steps.lastIndex) {
-        val stepFraction = i.toDouble() / steps.lastIndex
+    val measuredTickLabels = mutableListOf<MeasuredTickLabel>()
+    for (i in 0..valueTicks.lastIndex) {
+        val valueTick = valueTicks[i]
+        val stepFraction = i.toDouble() / valueTicks.lastIndex
         val plotBottom = size.height - args.bottomGutter
         val plotHeight = size.height - args.topGutter - args.bottomGutter
         val stepY = (plotBottom - plotHeight * stepFraction).toFloat()
@@ -42,9 +45,28 @@ fun <T> DrawScope.drawVerticalAxis(
             start = Offset(horizontalLineStartX, stepY),
             end = Offset(lineX, stepY)
         )
+        valueTick.label?.let {
+            val measuredLabel = args.textMeasurer.measure(
+                text = it,
+                style = args.axisTextStyle
+            )
+            measuredTickLabels.add(
+                MeasuredTickLabel(
+                    textLayoutResult = measuredLabel,
+                    topLeft = Offset(
+                        if (layoutDirection == LayoutDirection.Ltr) {
+                            horizontalLineStartX + args.textPaddingMinHorizontal
+                        } else {
+                            horizontalLineStartX - args.textPaddingMinHorizontal - measuredLabel.size.width
+                        },
+                        stepY
+                    ),
+                )
+            )
+        }
 
-        val measuredText = measurer.measure(
-            text = stepFormatter(steps[i]) ?: continue,
+        val measuredText = args.textMeasurer.measure(
+            text = valueFormatter(valueTick.value) ?: continue,
             style = args.axisTextStyle
         )
         val textTopLeftX =
@@ -55,8 +77,16 @@ fun <T> DrawScope.drawVerticalAxis(
             color = args.axisColor,
             topLeft = Offset(
                 x = textTopLeftX,
-                y = stepY - (measuredText.size.height / 2)
+                y = (stepY - measuredText.size.height / 2).let {
+                    // This step adjusts the terminal texts so they're above or below their guides
+                    when (i) {
+                        0 -> it - measuredText.size.height / 4
+                        valueTicks.lastIndex -> it + measuredText.size.height / 4
+                        else -> it
+                    }
+                }
             )
         )
     }
+    return VerticalAxisDrawLater(measuredTickLabels)
 }

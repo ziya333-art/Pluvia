@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright 2024 David Takač
   ~
   ~ This file is part of Bura.
@@ -8,9 +9,7 @@
   ~ Bura is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License along with Bura. If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
+  --><resources>
     <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Neuspješno preuzimanje prognoze. Spoji se na Internet i pokušaj ponovno.</string>
     <string name="general_error_outdated">Spremljena prognoza je istekla. Spoji se na Internet i pokušaj ponovno.</string>
@@ -94,6 +93,9 @@
     <string name="precip_value_cm">%s cm</string>
     <string name="precip_unit_in">″</string>
     <string name="precip_value_in">%s″</string>
+    <string name="precip_label_light">Lagano</string>
+    <string name="precip_label_moderate">Umjereno</string>
+    <string name="precip_label_heavy">Jako</string>
     <string name="pop_value_percent">%s%%</string>
     <string name="pressure">Pritisak</string>
     <string name="pressure_trend_falling">Pada</string>
@@ -108,8 +110,8 @@
     <string name="pressure_value_mmhg">%s mmHg</string>
     <string name="humidity">Vlaga</string>
     <string name="humidity_value_percent">%s%%</string>
-    <string name="sunrise">Izlazak Sunca</string>
-    <string name="sunset">Zalazak Sunca</string>
+    <string name="sunrise">Izlazak sunca</string>
+    <string name="sunset">Zalazak sunca</string>
     <string name="sunrise_short">@string/sunrise</string>
     <string name="sunset_short">@string/sunset</string>
     <string name="sunrise_value">Izlazak: %s</string>
@@ -119,17 +121,17 @@
     <string name="sunrise_value_more_than_days_away">&gt; %sd</string>
     <string name="sunrise_value_more_than_hours_away">&gt; %sh</string>
     <string name="sunset_value_more_than_days_away">&gt; %sd</string>
-    <string name="sunset_value_more_than_hours_away">&gt; %sd</string>
+    <string name="sunset_value_more_than_hours_away">&gt; %sh</string>
     <string name="temp_value_degree">%s°</string>
     <string name="dew_point_value_right_now">Rosište je %s sada.</string>
     <string name="feels_like">Osjet</string>
     <string name="feels_like_value">Osjet %s</string>
     <string name="feels_like_value_actual">Stvarna %s</string>
-    <string name="feels_like_cooler_than_actual">Zbog vjetra se čini kao da je svježije.</string>
-    <string name="feels_like_colder_than_actual">Zbog vjetra se čini kao da je hladnije.</string>
-    <string name="feels_like_warmer_than_actual">Zbog vlage se čini kao da je toplije.</string>
-    <string name="feels_like_hotter_than_actual">Zbog vlage se čini kao da je vruće.</string>
-    <string name="feels_like_similar_to_actual">Osjet sličan stvarnoj temperaturi.</string>
+    <string name="feels_like_cooler_than_actual">Osjet je svježiji od stvarne temperature.</string>
+    <string name="feels_like_colder_than_actual">Osjet je hladniji od stvarne temperature.</string>
+    <string name="feels_like_warmer_than_actual">Osjet je topliji od stvarne temperature.</string>
+    <string name="feels_like_hotter_than_actual">Osjet je vrući od stvarne temperature.</string>
+    <string name="feels_like_similar_to_actual">Osjet je sličan stvarnoj temperaturi.</string>
     <string name="uv_index">UV Indeks</string>
     <string name="uv_index_risk_low">Nizak</string>
     <string name="uv_index_risk_moderate">Umjeren</string>
@@ -150,11 +152,12 @@
     <string name="vis_value_km">%s km</string>
     <string name="vis_unit_mi">mi</string>
     <string name="vis_value_mi">%s mi</string>
-    <string name="vis_description_perfect">Savršeno jasan pogled.</string>
-    <string name="vis_description_clear">Jasan pogled.</string>
-    <string name="vis_description_fair">Umjereno jasan pogled.</string>
-    <string name="vis_description_low">Ograničen pogled.</string>
-    <string name="vis_description_very_low">Vrlo ograničen pogled.</string>
+    <string name="vis_description_excellent">Savršeno jasna vidljivost.</string>
+    <string name="vis_description_very_good">Vrlo jasna vidljivost.</string>
+    <string name="vis_description_good">Umjereno jasna vidljivost za većinu aktivnosti.</string>
+    <string name="vis_description_moderate">Blago smanjena vidljivost s minimalnim utjecajem.</string>
+    <string name="vis_description_poor">Smanjena vidljivost koja može utjecati na putovanja.</string>
+    <string name="vis_description_very_poor">Opasno malena vidljivost za putovanja.</string>
     <string name="wind_label">Vjetar</string>
     <string name="wind_bft_0">Tišina</string>
     <string name="wind_bft_1">Lahor</string>
@@ -213,4 +216,8 @@
     <string name="unexpected_error_screen_label_clip_entry">Izvješće o pogrešci</string>
     <string name="unexpected_error_screen_btn_copy_logs">Kopiraj sve</string>
     <string name="unexpected_error_screen_btn_go_home">Početna stranica</string>
+    <string name="searched_place_edit_tz_title">Postavi vremensku zonu</string>
+    <string name="searched_place_edit_tz_description_value">Vremenska zona mjesta %1$s je \"%2$s\" koju tvoj uređaj ne podržava. Za korištenje ovog mjesta, postavi zonu ručno.</string>
+    <string name="searched_place_edit_tz_hint">Pretraži zone…</string>
+    <string name="searched_place_edit_tz_no_search_results_value">Nema rezultata za \"%1$s\"</string>
 </resources>

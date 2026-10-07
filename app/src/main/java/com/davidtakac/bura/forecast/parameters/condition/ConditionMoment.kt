@@ -12,21 +12,21 @@
 
 package com.davidtakac.bura.forecast.parameters.condition
 
-import com.davidtakac.bura.forecast.HourMoment
-import java.time.LocalDateTime
+import com.davidtakac.bura.forecast.Moment
+import java.time.ZonedDateTime
 import java.util.Objects
 
 class ConditionMoment(
-    hour: LocalDateTime,
+    timeZdt: ZonedDateTime,
     val condition: Condition
-) : HourMoment(hour) {
-    override fun toString(): String = "$hour: $condition"
+) : Moment(timeZdt) {
+    override fun toString(): String = "$timeZdt: $condition"
 
     override fun equals(other: Any?): Boolean =
         other is ConditionMoment
-                && other.hour == hour
+                && other.timeZdt == timeZdt
                 && other.condition == condition
 
     override fun hashCode(): Int =
-        Objects.hash(hour, condition)
+        Objects.hash(timeZdt, condition)
 }

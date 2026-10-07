@@ -14,6 +14,7 @@ package com.davidtakac.bura
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -22,6 +23,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.davidtakac.bura.graphs.EssentialGraphsDestination
+import com.davidtakac.bura.places.picker.PlacePickerViewModel
+import com.davidtakac.bura.places.search.compose.SearchedPlaceEditDestination
 import com.davidtakac.bura.settings.SettingsDestination
 import com.davidtakac.bura.summary.SummaryDestination
 import com.davidtakac.bura.theme.Theme
@@ -37,7 +40,7 @@ fun AppNavHost(theme: Theme, onThemeClick: (Theme) -> Unit) {
     val unexpectedErrorState = unexpectedErrorVM.state.collectAsStateWithLifecycle().value
     LaunchedEffect(unexpectedErrorState) {
         if (unexpectedErrorState is UnexpectedErrorUiState.Ongoing) {
-            controller.navigate("unexpected-error/${unexpectedErrorState.cause}") {
+            controller.navigate("unexpected-error") {
                 popUpTo(controller.graph.startDestinationId) {
                     inclusive = true
                 }
@@ -59,7 +62,22 @@ fun AppNavHost(theme: Theme, onThemeClick: (Theme) -> Unit) {
                 },
                 onPrecipitationClick = {
                     controller.navigate("essential-graphs")
-                }
+                },
+                onSearchedPlaceEditRequest = {
+                    controller.navigate("searched-place-edit")
+                },
+            )
+        }
+        composable("searched-place-edit") { backStackEntry ->
+            val viewModel = viewModel<PlacePickerViewModel>(
+                viewModelStoreOwner = remember(backStackEntry) {
+                    controller.getBackStackEntry("summary")
+                },
+                factory = PlacePickerViewModel.Factory,
+            )
+            SearchedPlaceEditDestination(
+                viewModel = viewModel,
+                onSearchedPlaceToEditNull = controller::navigateUp
             )
         }
         composable(
@@ -85,18 +103,9 @@ fun AppNavHost(theme: Theme, onThemeClick: (Theme) -> Unit) {
                 onBackClick = controller::navigateUp
             )
         }
-        composable(
-            route = "unexpected-error/{cause}",
-            arguments = listOf(
-                navArgument("cause") {
-                    nullable = false
-                    type = NavType.StringType
-                }
-            )
-        ) { backStackEntry ->
-            val cause = backStackEntry.arguments?.getString("cause")!!
+        composable("unexpected-error") {
             UnexpectedErrorScreen(
-                cause = cause,
+                cause = (unexpectedErrorState as UnexpectedErrorUiState.Ongoing).cause,
                 onGoHomeClick = {
                     unexpectedErrorVM.consumeError()
                     controller.navigate("summary") {

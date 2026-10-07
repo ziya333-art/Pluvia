@@ -18,7 +18,7 @@ data class Place(
     val admin2: String?,
     val admin3: String?,
     val admin4: String?,
-    val countryCode: String,
+    val countryCode: String?,
     val countryName: String?,
     val location: Location
 )

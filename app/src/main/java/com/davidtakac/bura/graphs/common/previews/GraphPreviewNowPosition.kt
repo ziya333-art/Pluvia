@@ -10,16 +10,8 @@
  * You should have received a copy of the GNU General Public License along with Bura. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.davidtakac.bura.forecast.parameters
+package com.davidtakac.bura.graphs.common.previews
 
-import com.davidtakac.bura.forecast.HourMoment
-import com.davidtakac.bura.unixEpochStart
-import org.junit.Test
-import java.time.temporal.ChronoUnit
-
-class HourMomentTest {
-    @Test(expected = IllegalArgumentException::class)
-    fun `hour must be truncated to hour`() {
-        HourMoment(unixEpochStart.plus(1, ChronoUnit.MINUTES))
-    }
+enum class GraphPreviewNowPosition {
+    Start, Middle, End
 }

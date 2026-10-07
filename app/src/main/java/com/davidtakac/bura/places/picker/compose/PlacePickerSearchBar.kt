@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU General Public License along with Bura. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.davidtakac.bura.places.picker
+package com.davidtakac.bura.places.picker.compose
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.CubicBezierEasing
@@ -40,6 +40,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.davidtakac.bura.R
 import com.davidtakac.bura.places.Place
+import com.davidtakac.bura.places.picker.PlacePickerResults
+import com.davidtakac.bura.places.picker.PlacePickerState
+import com.davidtakac.bura.places.saved.compose.SavedPlaces
+import com.davidtakac.bura.places.search.SearchedPlace
+import com.davidtakac.bura.places.search.compose.SearchedPlaces
 
 // region Collapsed search bar horizontal padding workaround
 
@@ -84,6 +89,7 @@ fun PlacePickerSearchBar(
     onActiveChange: (Boolean) -> Unit,
     onSearchClick: (query: String) -> Unit,
     onPlaceClick: (Place) -> Unit,
+    onSearchedPlaceClick: (SearchedPlace) -> Unit,
     onPlaceDeleteClick: (Place) -> Unit,
     onSettingsClick: () -> Unit
 ) {
@@ -129,11 +135,22 @@ fun PlacePickerSearchBar(
             .padding(horizontal = horizontalPadding)
             .focusRequester(focusRequester)
     ) {
-        PlacePickerResults(
-            state = state,
-            onPlaceClick = onPlaceClick,
-            onPlaceDeleteClick = onPlaceDeleteClick
-        )
+        when (state.results) {
+            is PlacePickerResults.SavedPlaces ->
+                SavedPlaces(
+                    state = state.results,
+                    loading = state.loading,
+                    onPlaceClick = onPlaceClick,
+                    onPlaceDeleteClick = onPlaceDeleteClick
+                )
+            is PlacePickerResults.SearchedPlaces ->
+                SearchedPlaces(
+                    state = state.results,
+                    loading = state.loading,
+                    onPlaceClick = onSearchedPlaceClick
+                )
+            else -> Unit
+        }
     }
 }
 

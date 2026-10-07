@@ -16,30 +16,28 @@ import com.davidtakac.bura.forecast.parameters.condition.Condition
 import com.davidtakac.bura.forecast.parameters.condition.ConditionPeriod
 import com.davidtakac.bura.forecast.parameters.precipitation.MixedPrecipitation
 import com.davidtakac.bura.forecast.parameters.precipitation.PrecipitationPeriod
-import com.davidtakac.bura.graphs.common.GraphTime
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 fun getPrecipitationGraphs(
-    now: LocalDateTime,
+    now: ZonedDateTime,
     precipPeriod: PrecipitationPeriod,
     condPeriod: ConditionPeriod
 ): PrecipitationGraphs? {
-    val precipDays = precipPeriod.daysFrom(now.toLocalDate()) ?: return null
-    val condDays = condPeriod.daysFrom(now.toLocalDate()) ?: return null
+    val precipDays = precipPeriod.dayPeriodsFrom(now.toLocalDate()) ?: return null
+    val condDays = condPeriod.dayPeriodsFrom(now.toLocalDate()) ?: return null
     return PrecipitationGraphs(
+        now = now.toInstant(),
         max = precipDays.maxOf { it.max },
         graphs = precipDays.mapIndexed { dayIdx, day ->
             PrecipitationGraph(
-                day = day.first().hour.toLocalDate(),
+                day = day.first().timeZdt.toLocalDate(),
                 points = buildList {
                     addAll(
                         day.mapIndexed { momentIdx, moment ->
                             PrecipitationGraphPoint(
-                                time = GraphTime(
-                                    hour = moment.hour,
-                                    now = now
-                                ),
+                                time = moment.timeZdt,
                                 precip = moment.precipitation,
                                 cond = condDays[dayIdx][momentIdx].condition
                             )
@@ -52,6 +50,7 @@ fun getPrecipitationGraphs(
 }
 
 data class PrecipitationGraphs(
+    val now: Instant,
     val max: MixedPrecipitation,
     val graphs: List<PrecipitationGraph>
 )
@@ -62,7 +61,7 @@ data class PrecipitationGraph(
 )
 
 data class PrecipitationGraphPoint(
-    val time: GraphTime,
+    val time: ZonedDateTime,
     val precip: MixedPrecipitation,
     val cond: Condition
 )

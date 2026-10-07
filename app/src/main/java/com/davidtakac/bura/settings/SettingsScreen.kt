@@ -13,13 +13,16 @@
 package com.davidtakac.bura.settings
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -30,20 +33,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.davidtakac.bura.R
-import com.davidtakac.bura.theme.Theme
 import com.davidtakac.bura.forecast.parameters.precipitation.Precipitation
 import com.davidtakac.bura.forecast.parameters.pressure.Pressure
 import com.davidtakac.bura.forecast.parameters.temperature.Temperature
-import com.davidtakac.bura.forecast.units.Units
 import com.davidtakac.bura.forecast.parameters.visibility.Visibility
 import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
+import com.davidtakac.bura.forecast.units.Units
 import com.davidtakac.bura.settings.common.compose.MultipleChoiceDialog
 import com.davidtakac.bura.settings.common.compose.PreferenceButton
 import com.davidtakac.bura.settings.common.compose.SectionLabel
 import com.davidtakac.bura.settings.common.compose.SettingsLoadingIndicator
+import com.davidtakac.bura.theme.Theme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +68,7 @@ fun SettingsScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         topBar = {
-            LargeTopAppBar(
+            MediumTopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -83,26 +87,40 @@ fun SettingsScreen(
         Crossfade(
             targetState = units,
             modifier = Modifier
-                .padding(contentPadding)
+                .padding(
+                    start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                    end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
+                    top = contentPadding.calculateTopPadding(),
+                )
                 .fillMaxSize(),
             label = "Settings crossfade"
         ) {
-            if (it != null) SettingsList(
-                units = it,
-                theme = theme,
-                onTemperatureUnitClick = onTemperatureUnitClick,
-                onWindUnitClick = onWindUnitClick,
-                onPrecipitationUnitClick = onPrecipitationUnitClick,
-                onRainUnitClick = onRainUnitClick,
-                onShowersUnitClick = onShowersUnitClick,
-                onSnowUnitClick = onSnowUnitClick,
-                onPressureUnitClick = onPressureUnitClick,
-                onVisibilityUnitClick = onVisibilityUnitClick,
-                onThemeClick = onThemeClick,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-            ) else SettingsLoadingIndicator(Modifier.fillMaxSize())
+            val bottomContentPadding = contentPadding.calculateBottomPadding()
+            val listContentPadding = PaddingValues(bottom = bottomContentPadding)
+            if (it != null) {
+                SettingsList(
+                    units = it,
+                    theme = theme,
+                    onTemperatureUnitClick = onTemperatureUnitClick,
+                    onWindUnitClick = onWindUnitClick,
+                    onPrecipitationUnitClick = onPrecipitationUnitClick,
+                    onRainUnitClick = onRainUnitClick,
+                    onShowersUnitClick = onShowersUnitClick,
+                    onSnowUnitClick = onSnowUnitClick,
+                    onPressureUnitClick = onPressureUnitClick,
+                    onVisibilityUnitClick = onVisibilityUnitClick,
+                    onThemeClick = onThemeClick,
+                    contentPadding = listContentPadding,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
+                )
+            } else {
+                SettingsLoadingIndicator(
+                    contentPadding = listContentPadding,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -120,6 +138,7 @@ private fun SettingsList(
     onPressureUnitClick: (Pressure.Unit) -> Unit,
     onVisibilityUnitClick: (Visibility.Unit) -> Unit,
     onThemeClick: (Theme) -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     var showTempDialog by remember { mutableStateOf(false) }
@@ -267,7 +286,10 @@ private fun SettingsList(
         )
     }
 
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        contentPadding = contentPadding,
+        modifier = modifier
+    ) {
         item {
             SectionLabel(label = stringResource(id = R.string.settings_screen_title_units))
         }

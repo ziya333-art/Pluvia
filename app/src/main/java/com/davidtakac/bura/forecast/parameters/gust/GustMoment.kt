@@ -12,22 +12,22 @@
 
 package com.davidtakac.bura.forecast.parameters.gust
 
-import com.davidtakac.bura.forecast.HourMoment
+import com.davidtakac.bura.forecast.Moment
 import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.Objects
 
 class GustMoment(
-    hour: LocalDateTime,
+    timeZdt: ZonedDateTime,
     val speed: WindSpeed
-) : HourMoment(hour) {
-    override fun toString(): String = "$hour: $speed"
+) : Moment(timeZdt) {
+    override fun toString(): String = "$timeZdt: $speed"
 
     override fun equals(other: Any?): Boolean =
         other is GustMoment
-                && other.hour == hour
+                && other.timeZdt == timeZdt
                 && other.speed == speed
 
     override fun hashCode(): Int =
-        Objects.hash(hour, speed)
+        Objects.hash(timeZdt, speed)
 }

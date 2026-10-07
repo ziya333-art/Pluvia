@@ -12,21 +12,21 @@
 
 package com.davidtakac.bura.forecast.parameters.wind
 
-import com.davidtakac.bura.forecast.HourMoment
-import java.time.LocalDateTime
+import com.davidtakac.bura.forecast.Moment
+import java.time.ZonedDateTime
 import java.util.Objects
 
 class WindMoment(
-    hour: LocalDateTime,
+    timeZdt: ZonedDateTime,
     val wind: Wind
-) : HourMoment(hour) {
-    override fun toString(): String = "$hour: $wind"
+) : Moment(timeZdt) {
+    override fun toString(): String = "$timeZdt: $wind"
 
     override fun equals(other: Any?): Boolean =
         other is WindMoment
-                && other.hour == hour
+                && other.timeZdt == timeZdt
                 && other.wind == wind
 
     override fun hashCode(): Int =
-        Objects.hash(hour, wind)
+        Objects.hash(timeZdt, wind)
 }

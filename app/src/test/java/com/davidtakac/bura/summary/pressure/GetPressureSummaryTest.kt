@@ -15,7 +15,7 @@ package com.davidtakac.bura.summary.pressure
 import com.davidtakac.bura.forecast.parameters.pressure.Pressure
 import com.davidtakac.bura.forecast.parameters.pressure.PressureMoment
 import com.davidtakac.bura.forecast.parameters.pressure.PressurePeriod
-import com.davidtakac.bura.unixEpochStart
+import com.davidtakac.bura.unixEpochStartZdt
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
@@ -24,16 +24,16 @@ import java.time.temporal.ChronoUnit
 class GetPressureSummaryTest {
     @Test
     fun `when at least one moment before now, returns now and trend`() = runTest {
-        val firstMoment = unixEpochStart
+        val firstMoment = unixEpochStartZdt
         val secondMoment = firstMoment.plus(1, ChronoUnit.HOURS)
         val period = PressurePeriod(
             moments = listOf(
                 PressureMoment(
-                    hour = firstMoment,
+                    timeZdt = firstMoment,
                     pressure = Pressure(0.0, Pressure.Unit.Hectopascal)
                 ),
                 PressureMoment(
-                    hour = secondMoment,
+                    timeZdt = secondMoment,
                     pressure = Pressure(1.0, Pressure.Unit.Hectopascal)
                 )
             )
@@ -51,12 +51,54 @@ class GetPressureSummaryTest {
     }
 
     @Test
+    fun `trend falling`() = runTest {
+        val now = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        val past = Pressure(1002.0, Pressure.Unit.Hectopascal)
+        Assert.assertEquals(PressureTrend.Falling, getPressureTrend(past, now))
+    }
+
+    @Test
+    fun `trend rising`() = runTest {
+        val now = Pressure(1002.0, Pressure.Unit.Hectopascal)
+        val past = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        Assert.assertEquals(PressureTrend.Rising, getPressureTrend(past, now))
+    }
+
+    @Test
+    fun `trend stable`() = runTest {
+        val now = Pressure(1000.5, Pressure.Unit.Hectopascal)
+        val past = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        Assert.assertEquals(PressureTrend.Stable, getPressureTrend(past, now))
+    }
+
+    @Test
+    fun `trend rising on border`() = runTest {
+        val now = Pressure(1001.0, Pressure.Unit.Hectopascal)
+        val past = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        Assert.assertEquals(PressureTrend.Rising, getPressureTrend(past, now))
+    }
+
+    @Test
+    fun `trend falling on border`() = runTest {
+        val now = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        val past = Pressure(1001.0, Pressure.Unit.Hectopascal)
+        Assert.assertEquals(PressureTrend.Falling, getPressureTrend(past, now))
+    }
+
+    @Test
+    fun `trend stable when same`() = runTest {
+        val now = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        val past = Pressure(1000.0, Pressure.Unit.Hectopascal)
+        Assert.assertEquals(PressureTrend.Stable, getPressureTrend(past, now))
+    }
+
+    @Test
     fun `when no moments at now, summary is outdated`() = runTest {
-        val firstMoment = unixEpochStart
+        val firstMoment = unixEpochStartZdt
         val period = PressurePeriod(
             moments = listOf(
                 PressureMoment(
-                    hour = firstMoment,
+                    timeZdt = firstMoment,
                     pressure = Pressure(1.0, Pressure.Unit.Hectopascal)
                 )
             )
@@ -67,11 +109,11 @@ class GetPressureSummaryTest {
 
     @Test
     fun `when no moments before now, summary is outdated`() = runTest {
-        val firstMoment = unixEpochStart
+        val firstMoment = unixEpochStartZdt
         val period = PressurePeriod(
             moments = listOf(
                 PressureMoment(
-                    hour = firstMoment,
+                    timeZdt = firstMoment,
                     pressure = Pressure(1.0, Pressure.Unit.Hectopascal)
                 )
             )

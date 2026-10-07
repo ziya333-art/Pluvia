@@ -24,7 +24,7 @@ import com.davidtakac.bura.App
 import com.davidtakac.bura.common.util.launchCatching
 import com.davidtakac.bura.forecast.ForecastRepository
 import com.davidtakac.bura.forecast.units.SelectedUnitsRepository
-import com.davidtakac.bura.graphs.pop.PopGraph
+import com.davidtakac.bura.graphs.pop.PopGraphs
 import com.davidtakac.bura.graphs.pop.getPopGraphs
 import com.davidtakac.bura.graphs.precipitation.PrecipitationGraphs
 import com.davidtakac.bura.graphs.precipitation.PrecipitationTotal
@@ -63,10 +63,9 @@ class EssentialGraphsViewModel(
 
     private suspend fun getState(): EssentialGraphsState {
         val location = placeRepo.getSelectedPlace()?.location ?: return EssentialGraphsState.NoSelectedPlace
-        val coords = location.coordinates
         val units = unitsRepo.getSelectedUnits()
-        val now = Instant.now().atZone(location.timeZone).toLocalDateTime()
-        val forecast = forecastRepo.get(coords, units) ?: return EssentialGraphsState.FailedToDownload
+        val now = Instant.now().atZone(location.timeZone)
+        val forecast = forecastRepo.get(location, units) ?: return EssentialGraphsState.FailedToDownload
 
         val tempGraphSummaries = getTemperatureGraphSummaries(
             now = now,
@@ -131,7 +130,7 @@ sealed interface EssentialGraphsState {
     data class Success(
         val tempGraphSummaries: List<TemperatureGraphSummary>,
         val tempGraphs: TemperatureGraphs,
-        val popGraphs: List<PopGraph>,
+        val popGraphs: PopGraphs,
         val precipGraphs: PrecipitationGraphs,
         val precipTotals: List<PrecipitationTotal>,
         val windGraphs: WindGraphs,

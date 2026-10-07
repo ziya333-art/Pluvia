@@ -13,25 +13,25 @@
 package com.davidtakac.bura.forecast.parameters.precipitation
 
 import com.davidtakac.bura.forecast.HourPeriod
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class PrecipitationPeriod(moments: List<PrecipitationMoment>) : HourPeriod<PrecipitationMoment>(moments) {
     val total: MixedPrecipitation get() = map { it.precipitation }.reduce { acc, precipitation -> acc + precipitation }
     val max: MixedPrecipitation get() = maxOf { it.precipitation }
 
-    override fun momentsUntil(hourExclusive: LocalDateTime, takeMoments: Int?) =
-        super.momentsUntil(hourExclusive, takeMoments)?.let { PrecipitationPeriod(it) }
+    fun periodUntil(hourExclusive: Instant, takeLast: Int? = null) =
+        momentsUntil(hourExclusive, takeLast)?.let { PrecipitationPeriod(it) }
 
-    override fun momentsFrom(hourInclusive: LocalDateTime, takeMoments: Int?) =
-        super.momentsFrom(hourInclusive, takeMoments)?.let { PrecipitationPeriod(it) }
+    fun periodFrom(hourInclusive: Instant, take: Int? = null) =
+        momentsFrom(hourInclusive, take)?.let { PrecipitationPeriod(it) }
 
-    override fun daysFrom(dayInclusive: LocalDate, takeDays: Int?) =
-        super.daysFrom(dayInclusive, takeDays)?.map { PrecipitationPeriod(it) }
+    fun dayPeriodsFrom(dayInclusive: LocalDate, take: Int? = null) =
+        dayMomentsFrom(dayInclusive, take)?.map { PrecipitationPeriod(it) }
 
     fun convertTo(unit: Precipitation.Unit): PrecipitationPeriod {
         if (first().precipitation.unit == unit) return this
-        val convertedMoments = map { PrecipitationMoment(it.hour, it.precipitation.convertTo(unit)) }
+        val convertedMoments = map { PrecipitationMoment(it.timeZdt, it.precipitation.convertTo(unit)) }
         return PrecipitationPeriod(convertedMoments)
     }
 }

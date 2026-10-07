@@ -12,21 +12,21 @@
 
 package com.davidtakac.bura.forecast.parameters.pop
 
-import com.davidtakac.bura.forecast.HourMoment
-import java.time.LocalDateTime
+import com.davidtakac.bura.forecast.Moment
+import java.time.ZonedDateTime
 import java.util.Objects
 
 class PopMoment(
-    hour: LocalDateTime,
+    timeZdt: ZonedDateTime,
     val pop: Pop
-) : HourMoment(hour) {
-    override fun toString(): String = "$hour: $pop"
+) : Moment(timeZdt) {
+    override fun toString(): String = "$timeZdt: $pop"
 
     override fun equals(other: Any?): Boolean =
         other is PopMoment
-                && other.hour == hour
+                && other.timeZdt == timeZdt
                 && other.pop == pop
 
     override fun hashCode(): Int =
-        Objects.hash(hour, pop)
+        Objects.hash(timeZdt, pop)
 }

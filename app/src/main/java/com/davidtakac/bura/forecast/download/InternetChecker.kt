@@ -10,14 +10,18 @@
  * You should have received a copy of the GNU General Public License along with Bura. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.davidtakac.bura.forecast
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+package com.davidtakac.bura.forecast.download
 
-open class HourMoment(val hour: LocalDateTime) {
-    init {
-        require(hour == hour.truncatedTo(ChronoUnit.HOURS)) {
-            "Time of HourMoment must be whole hour, but was $hour."
-        }
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+
+class InternetChecker(private val context: Context) {
+    fun hasInternet(): Boolean {
+        val connMan = context.getSystemService(ConnectivityManager::class.java)
+        val network = connMan.activeNetwork ?: return false
+        val caps = connMan.getNetworkCapabilities(network) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }

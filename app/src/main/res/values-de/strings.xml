@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2024 David Takač
   ~
@@ -8,9 +9,7 @@
   ~ Bura is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License along with Bura. If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
+  --><resources>
     <string name="app_name">Pluvia</string>
     <string name="general_error_failed_to_download">Herunterladen der Vorhersage fehlgeschlagen. Stellen Sie eine Internetverbindung her und versuchen Sie es erneut.</string>
     <string name="general_error_outdated">Ihre Vorhersagedaten sind abgelaufen. Verbinden Sie sich mit dem Internet und versuchen Sie es erneut.</string>
@@ -19,10 +18,8 @@
     <string name="general_btn_select_place">Ort auswählen</string>
     <string name="general_btn_dialog_confirm">OK</string>
     <string name="general_btn_dialog_cancel">Abbrechen</string>
-
     <string name="credit_weather">Wetterdaten von Open-Meteo.com</string>
     <string name="credit_geocoding">Geokodierungsdaten von Open-Meteo.com</string>
-
     <string name="place_picker_hint_search">Orte durchsuchen…</string>
     <string name="place_picker_title_saved_places">Gespeicherte Orte</string>
     <string name="place_picker_title_search_results">Suchergebnisse</string>
@@ -31,7 +28,6 @@
     <string name="place_picker_error_no_saved_places">Keine gespeicherten Orte.</string>
     <string name="delete_place_value">%s löschen?</string>
     <string name="delete_place_description">Dabei werden auch die zwischengespeicherten Vorhersagedaten gelöscht.</string>
-
     <string name="cond_screen_title">Bedingungen</string>
     <string name="cond_screen_pop">Niederschlagswahrscheinlichkeit</string>
     <string name="cond_screen_precip">Gesamtniederschlag</string>
@@ -39,7 +35,11 @@
     <string name="cond_screen_temp_unit_fahrenheit">Fahrenheit (°F)</string>
     <string name="cond_screen_precip_value_in_last_hours">Letzte %s Stunden</string>
     <string name="cond_screen_precip_value_in_next_hours">Nächste %s Stunden</string>
-
+    <string name="unexpected_error_screen_title">Unerwarteter Fehler</string>
+    <string name="unexpected_error_screen_description">Es ist ein unerwarteter Fehler aufgetreten. Um fortzufahren, gehen Sie zum Startbildschirm und versuchen Sie es erneut. Wenn Sie helfen möchten, erstellen Sie ein Problem auf GitHub und fügen Sie den folgenden Fehlerbericht ein.</string>
+    <string name="unexpected_error_screen_label_clip_entry">Fehlerbericht</string>
+    <string name="unexpected_error_screen_btn_copy_logs">Alle kopieren</string>
+    <string name="unexpected_error_screen_btn_go_home">Startbildschirm</string>
     <string name="settings_screen_title">Einstellungen</string>
     <string name="settings_screen_title_units">Einheiten</string>
     <string name="settings_screen_title_temp_unit">Temperatur</string>
@@ -71,7 +71,6 @@
     <string name="settings_screen_label_dark">Dunkel</string>
     <string name="settings_screen_label_light">Hell</string>
     <string name="settings_screen_label_follow_system">System folgen</string>
-
     <string name="date_time_now">Jetzt</string>
     <string name="date_time_today">Heute</string>
     <string name="date_time_pattern_hour">HH</string>
@@ -81,7 +80,6 @@
     <string name="date_time_pattern_dow">E</string>
     <string name="date_time_pattern_dow_hour_minute">E, HH:mm</string>
     <string name="date_time_pattern_dow_hour_minute_ampm">E, h:mm\u2009a</string>
-
     <string name="precip_mixed">Niederschlag</string>
     <string name="precip_rain">Regen</string>
     <string name="precip_showers">Schauer</string>
@@ -102,9 +100,7 @@
     <string name="precip_value_cm">%s cm</string>
     <string name="precip_unit_in">″</string>
     <string name="precip_value_in">%s″</string>
-
     <string name="pop_value_percent">%s%%</string>
-
     <string name="pressure">Druck</string>
     <string name="pressure_trend_falling">Fallend</string>
     <string name="pressure_trend_steady">Konstant</string>
@@ -116,12 +112,16 @@
     <string name="pressure_value_inhg">%s inHg</string>
     <string name="pressure_unit_mmhg">mmHg</string>
     <string name="pressure_value_mmhg">%s mmHg</string>
-
     <string name="humidity">Luftfeuchtigkeit</string>
     <string name="humidity_value_percent">%s%%</string>
-
     <string name="sunrise">Sonnenaufgang</string>
     <string name="sunset">Sonnenuntergang</string>
+    <!--
+    sunrise_short and sunset_short are used in the hourly forecast on the Summary (Home) screen.
+    To make these strings visually consistent with the hour strings, you can override them with
+    shorter strings when it makes sense and sounds natural for the language in question. Otherwise
+    reference the full strings @string/sunrise and @string/sunset. For more info, see issue #62.
+    -->
     <string name="sunrise_short">@string/sunrise</string>
     <string name="sunset_short">@string/sunset</string>
     <string name="sunrise_value">Sonnenaufgang: %s</string>
@@ -132,7 +132,6 @@
     <string name="sunrise_value_more_than_hours_away">&gt; %sh</string>
     <string name="sunset_value_more_than_days_away">&gt; %sd</string>
     <string name="sunset_value_more_than_hours_away">&gt; %sh</string>
-
     <string name="temp_value_degree">%s°</string>
     <string name="dew_point_value_right_now">Der Taupunkt liegt im Moment bei %s.</string>
     <string name="feels_like">Fühlt sich an wie</string>
@@ -143,7 +142,6 @@
     <string name="feels_like_warmer_than_actual">Durch die Feuchtigkeit fühlt es sich wärmer an.</string>
     <string name="feels_like_hotter_than_actual">Durch die Feuchtigkeit fühlt es sich heißer an.</string>
     <string name="feels_like_similar_to_actual">Ähnlich wie die tatsächliche Temperatur.</string>
-
     <string name="uv_index">UV-Index</string>
     <string name="uv_index_risk_low">Niedrig</string>
     <string name="uv_index_risk_moderate">Mäßig</string>
@@ -155,7 +153,6 @@
     <string name="uv_index_protection_value_until">Verwenden Sie Sonnenschutz bis %s.</string>
     <string name="uv_index_protection_value_until_end_of_day">Benutzen Sie den Rest des Tages Sonnenschutz.</string>
     <string name="uv_index_protection_value_none">Niedrig für den Rest des Tages.</string>
-
     <string name="vis">Sichtweite</string>
     <string name="vis_unit_m">m</string>
     <string name="vis_value_m">%s m</string>
@@ -165,12 +162,11 @@
     <string name="vis_value_km">%s km</string>
     <string name="vis_unit_mi">mi</string>
     <string name="vis_value_mi">%s mi</string>
-    <string name="vis_description_perfect">Völlig klare Sicht.</string>
-    <string name="vis_description_clear">Freie Sicht.</string>
-    <string name="vis_description_fair">Ziemlich klare Sicht.</string>
-    <string name="vis_description_low">Eingeschränkte Sicht.</string>
-    <string name="vis_description_very_low">Stark eingeschränkte Sicht.</string>
-
+    <string name="vis_description_excellent">Völlig klare Sicht.</string>
+    <string name="vis_description_good">Freie Sicht.</string>
+    <string name="vis_description_moderate">Ziemlich klare Sicht.</string>
+    <string name="vis_description_poor">Eingeschränkte Sicht.</string>
+    <string name="vis_description_very_poor">Stark eingeschränkte Sicht.</string>
     <string name="wind_label">Wind</string>
     <string name="wind_bft_0">Windstille</string>
     <string name="wind_bft_1">Leiser Zug</string>
@@ -194,7 +190,6 @@
     <string name="wind_value_kn">%s kn</string>
     <string name="wind_unit_mph">mi/h</string>
     <string name="wind_value_mph">%s mi/h</string>
-
     <string name="wmo_0">Klar</string>
     <string name="wmo_1">Meistens klar</string>
     <string name="wmo_2">Teilweise bewölkt</string>
@@ -223,4 +218,12 @@
     <string name="wmo_95">Gewitter</string>
     <string name="wmo_96">Gewitter mit leichtem Hagel</string>
     <string name="wmo_99">Gewitter mit schwerem Hagel</string>
+    <string name="precip_label_light">Leicht</string>
+    <string name="precip_label_moderate">Mäßig</string>
+    <string name="precip_label_heavy">Stark</string>
+    <string name="vis_description_very_good">Sehr klare Sicht.</string>
+    <string name="searched_place_edit_tz_title">Zeitzone festlegen</string>
+    <string name="searched_place_edit_tz_description_value">Die Zeitzone von %1$s ist \"%2$s\", wird von Ihrem Gerät jedoch nicht erkannt. Um diesen Standort zu verwenden, stellen Sie die Zeitzone manuell ein.</string>
+    <string name="searched_place_edit_tz_hint">Zeitzonen suchen…</string>
+    <string name="searched_place_edit_tz_no_search_results_value">Keine passenden Zeitzonen für \"%1$s\"</string>
 </resources>

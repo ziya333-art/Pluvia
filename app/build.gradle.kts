@@ -18,7 +18,7 @@ plugins {
 
 android {
     namespace = "com.davidtakac.bura"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.davidtakac.bura"
@@ -45,6 +45,7 @@ android {
                 "ar",
                 "zh-rTW",
                 "cs",
+                "el",
             )
         )
     }

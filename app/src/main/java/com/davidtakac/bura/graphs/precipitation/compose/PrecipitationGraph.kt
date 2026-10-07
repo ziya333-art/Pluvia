@@ -12,41 +12,30 @@
 
 package com.davidtakac.bura.graphs.precipitation.compose
 
-import android.content.Context
-import androidx.appcompat.content.res.AppCompatResources
+import android.content.res.Resources
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
-import com.davidtakac.bura.theme.AppTheme
-import com.davidtakac.bura.forecast.parameters.condition.Condition
-import com.davidtakac.bura.forecast.parameters.condition.image
-import com.davidtakac.bura.graphs.common.GraphArgs
-import com.davidtakac.bura.graphs.common.GraphTime
-import com.davidtakac.bura.graphs.common.NiceScale
-import com.davidtakac.bura.graphs.common.drawing.drawPastOverlay
-import com.davidtakac.bura.graphs.common.drawing.drawTimeAxis
-import com.davidtakac.bura.graphs.common.drawing.drawVerticalAxis
+import com.davidtakac.bura.R
+import com.davidtakac.bura.forecast.parameters.condition.imageBitmap
 import com.davidtakac.bura.forecast.parameters.precipitation.MixedPrecipitation
 import com.davidtakac.bura.forecast.parameters.precipitation.Precipitation
 import com.davidtakac.bura.forecast.parameters.precipitation.Rain
@@ -54,99 +43,92 @@ import com.davidtakac.bura.forecast.parameters.precipitation.Showers
 import com.davidtakac.bura.forecast.parameters.precipitation.Snow
 import com.davidtakac.bura.forecast.parameters.precipitation.string
 import com.davidtakac.bura.forecast.parameters.precipitation.valueString
-import com.davidtakac.bura.graphs.precipitation.PrecipitationGraph
+import com.davidtakac.bura.graphs.common.GraphArgs
+import com.davidtakac.bura.graphs.common.HorizontalAxisDrawLater
+import com.davidtakac.bura.graphs.common.NiceScale
+import com.davidtakac.bura.graphs.common.ValueTick
+import com.davidtakac.bura.graphs.common.VerticalAxisDrawLater
+import com.davidtakac.bura.graphs.common.drawing.drawGutterIcon
+import com.davidtakac.bura.graphs.common.drawing.drawMeasuredTickLabel
+import com.davidtakac.bura.graphs.common.drawing.drawPastOverlay
+import com.davidtakac.bura.graphs.common.drawing.drawTimeAxis
+import com.davidtakac.bura.graphs.common.drawing.drawVerticalAxis
 import com.davidtakac.bura.graphs.precipitation.PrecipitationGraphPoint
-import java.time.LocalDate
-import java.time.LocalDateTime
+import com.davidtakac.bura.graphs.precipitation.PrecipitationGraphs
+import com.davidtakac.bura.theme.AppTheme
+import java.time.Instant
 import java.time.temporal.ChronoUnit
-import kotlin.math.roundToInt
-import kotlin.random.Random
+import kotlin.math.ceil
 
 @Composable
 fun PrecipitationGraph(
-    state: PrecipitationGraph,
+    now: Instant,
+    points: List<PrecipitationGraphPoint>,
     args: GraphArgs,
     max: MixedPrecipitation,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val measurer = rememberTextMeasurer()
+    val maxValue = max.value
     val unit = max.unit
     val rainColor = AppTheme.colors.rainColor
     val showersColor = AppTheme.colors.showersColor
     val snowColor = AppTheme.colors.snowColor
-    val (steps, newMax) = remember(max) {
-        val leastMax = MixedPrecipitation(
-            rain = Rain(4.0, Precipitation.Unit.Millimeters),
-            showers = Showers.ZeroMillimeters,
-            snow = Snow.ZeroMillimeters,
-            unit = Precipitation.Unit.Millimeters
-        )
-        val niceScale = NiceScale(
-            min = 0.0,
-            max = (if (max < leastMax) leastMax.convertTo(unit) else max).value,
-            maxTicks = 5
-        )
-        val niceMax = niceScale.niceMax + niceScale.niceSpacing
-        val niceSteps = niceScale.niceSteps.toMutableList().apply { add(niceMax) }
-        niceSteps.map {
-            MixedPrecipitation(
-                rain = Rain(it, max.unit),
-                showers = Showers.ZeroMillimeters,
-                snow = Snow.ZeroMillimeters,
-                unit = unit
-            )
-        } to MixedPrecipitation(
-            rain = Rain(niceMax, max.unit),
+    val resources = LocalResources.current
+    val (steps, newMax) = remember(maxValue, unit, resources) {
+        val valueTicks = getValueTicks(unit, maxValue, resources)
+        val newMax = MixedPrecipitation(
+            rain = Rain(valueTicks.last().value, unit),
             snow = Snow.ZeroMillimeters,
             showers = Showers.ZeroMillimeters,
             unit = unit
         )
+        valueTicks to newMax
     }
     Canvas(modifier) {
-        drawPrecipAxis(
-            context = context,
+        val verticalAxisDrawLater = drawPrecipAxis(
             steps = steps,
-            measurer = measurer,
-            args = args
+            args = args,
+            unit = unit,
         )
-        drawHorizontalAxisAndBars(
-            state = state,
+        val horizontalAxisDrawLater = drawHorizontalAxisAndBars(
+            now = now,
+            points = points,
+            gutterIcons = points.map {
+                it.cond.imageBitmap(args.context, args.icons, args.gutterIconSize)
+            },
             max = newMax,
-            context = context,
-            measurer = measurer,
             rainColor = rainColor,
             showersColor = showersColor,
             snowColor = snowColor,
             args = args
         )
+        verticalAxisDrawLater.measuredTickLabels.forEach {
+            drawMeasuredTickLabel(args, it)
+        }
+        horizontalAxisDrawLater.nowCenter?.let {
+            drawPastOverlay(nowX = it.x, args = args)
+        }
     }
 }
 
 private fun DrawScope.drawHorizontalAxisAndBars(
-    state: PrecipitationGraph,
+    now: Instant,
+    points: List<PrecipitationGraphPoint>,
+    gutterIcons: List<ImageBitmap>,
     max: Precipitation,
     rainColor: Color,
     showersColor: Color,
     snowColor: Color,
-    context: Context,
-    measurer: TextMeasurer,
     args: GraphArgs
-) {
-    val iconSize = 24.dp.toPx()
-    val iconSizeRound = iconSize.roundToInt()
-    val hasSpaceFor12Icons =
-        (size.width - args.startGutter - args.endGutter) - (iconSizeRound * 12) >= (12 * 2.dp.toPx())
-    val iconY = ((args.topGutter / 2) - (iconSize / 2)).roundToInt()
+): HorizontalAxisDrawLater {
     val range = max.value
-
     var nowX: Float? = null
     drawTimeAxis(
-        measurer = measurer,
+        times = points.map { it.time },
         args = args
     ) { i, x, calcY ->
-        val point = state.points.getOrNull(i) ?: return@drawTimeAxis
-        if (point.time.meta == GraphTime.Meta.Present) nowX = x
+        val point = points.getOrNull(i) ?: return@drawTimeAxis
+        if (point.time.toInstant() == now.truncatedTo(ChronoUnit.HOURS)) nowX = x
 
         val precip = point.precip
         val rain = precip.rain.convertTo(max.unit)
@@ -161,9 +143,13 @@ private fun DrawScope.drawHorizontalAxisAndBars(
         val desiredBarWidth = 8.dp.toPx()
 
         val barXOffset =
-            (if (layoutDirection == LayoutDirection.Ltr) desiredBarWidth else -desiredBarWidth) / 4
-        val barX = if (i == 0) x + barXOffset else x
-        val barWidth = if (i == 0) desiredBarWidth / 2 else desiredBarWidth
+            if (layoutDirection == LayoutDirection.Ltr) {
+                desiredBarWidth
+            } else {
+                -desiredBarWidth
+            } / 4
+        val barX = if (i == 0) x + barXOffset else if (i == points.lastIndex) x - barXOffset else x
+        val barWidth = if (i == 0 || i == points.lastIndex) desiredBarWidth / 2 else desiredBarWidth
         drawLine(
             brush = SolidColor(rainColor),
             start = Offset(barX, rainY.bot),
@@ -191,189 +177,138 @@ private fun DrawScope.drawHorizontalAxisAndBars(
         )
 
         // Condition icons
-        if (i % (if (hasSpaceFor12Icons) 2 else 3) == 1) {
-            val iconX = x - (iconSize / 2)
-            val iconDrawable =
-                AppCompatResources.getDrawable(context, point.cond.image(context, args.icons))!!
-            drawImage(
-                image = iconDrawable.toBitmap(
-                    width = iconSizeRound,
-                    height = iconSizeRound
-                ).asImageBitmap(),
-                dstOffset = IntOffset(iconX.roundToInt(), y = iconY),
-                dstSize = IntSize(width = iconSizeRound, height = iconSizeRound),
-            )
-        }
+        drawGutterIcon(i, x, gutterIcons[i], args)
     }
 
-    nowX?.let {
-        drawPastOverlay(nowX = it, args = args)
-    }
+    return HorizontalAxisDrawLater(
+        nowCenter = nowX?.let {
+            Offset(
+                x = it,
+                // y doesn't matter because we won't be drawing a point anyway
+                y = 0f
+            )
+        }
+    )
 }
 
 private fun DrawScope.drawPrecipAxis(
-    context: Context,
-    steps: List<Precipitation>,
-    measurer: TextMeasurer,
+    unit: Precipitation.Unit,
+    steps: List<ValueTick>,
     args: GraphArgs
-) {
+): VerticalAxisDrawLater =
     drawVerticalAxis(
-        steps = steps,
+        valueTicks = steps,
         args = args,
-        measurer = measurer,
-    ) { step ->
-        val valueString = step.valueString(args.numberFormat)
-        if (step == steps[0]) step.string(context, args.numberFormat) else valueString
+    ) { stepValue ->
+        val step = Rain(stepValue, unit)
+        if (stepValue == steps[0].value) {
+            step.string(args.context, args.numberFormat)
+        } else {
+            step.valueString(args.numberFormat)
+        }
+    }
+
+private fun getValueTicks(
+    unit: Precipitation.Unit,
+    max: Double,
+    resources: Resources,
+): List<ValueTick> {
+    val usualStepDelta = when (unit) {
+        Precipitation.Unit.Millimeters -> 3.0
+        Precipitation.Unit.Centimeters -> 0.3
+        Precipitation.Unit.Inches -> 0.1
+    }
+    val usualLightStep = usualStepDelta * 1
+    val usualModerateStep = usualStepDelta * 2
+    val usualHeavyStep = usualStepDelta * 3
+    val max = if (max < usualHeavyStep) {
+        usualHeavyStep
+    } else if (max == usualHeavyStep) {
+        // Avoids the case where pillar goes to the very top of the graph
+        max + 0.01
+    } else {
+        max
+    }
+    val stepsFromHeavyUntilMax = ceil((max - usualHeavyStep) / usualStepDelta).toInt()
+    return if (stepsFromHeavyUntilMax <= 3) {
+        // Everyday cases where light-moderate-heavy labels can be displayed, and
+        // heavier cases where three or fewer steps happen above heavy
+        buildList {
+            add(ValueTick(0.0))
+            add(ValueTick(usualLightStep, resources.getString(R.string.precip_label_light)))
+            add(ValueTick(usualModerateStep, resources.getString(R.string.precip_label_moderate)))
+            add(ValueTick(usualHeavyStep, resources.getString(R.string.precip_label_heavy)))
+            repeat(stepsFromHeavyUntilMax) {
+                add(ValueTick(usualHeavyStep + (usualStepDelta * (it + 1))))
+            }
+        }
+    } else {
+        // Unusual cases where there are more than three steps above heavy, which would crowd
+        // the graph if the everyday case was used
+        var usedLight = false
+        var usedModerate = false
+        var usedHeavy = false
+        NiceScale(min = 0.0, max = max, maxTicks = 5)
+            .niceSteps
+            .map { niceStep ->
+                ValueTick(
+                    value = niceStep,
+                    label = when {
+                        usedHeavy -> null
+                        niceStep >= usualHeavyStep -> resources.getString(R.string.precip_label_heavy).also { usedHeavy = true }
+                        usedModerate -> null
+                        niceStep >= usualModerateStep -> resources.getString(R.string.precip_label_moderate).also { usedModerate = true }
+                        usedLight -> null
+                        niceStep >= usualLightStep -> resources.getString(R.string.precip_label_light).also { usedLight = true }
+                        else -> null
+                    }
+                )
+            }
     }
 }
 
 @Preview
 @Composable
-private fun PrecipitationGraphPreview() {
+private fun PrecipitationGraphPreview(
+    @PreviewParameter(PrecipitationGraphsPreviewParameterProvider ::class) providedState: Pair<String, PrecipitationGraphs>
+) {
+    val state = providedState.second
     AppTheme {
-        PrecipitationGraph(
-            state = previewState,
-            args = GraphArgs.rememberPrecipitationArgs(),
-            max = previewState.points.maxOf { it.precip },
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4f / 3f)
-                .background(MaterialTheme.colorScheme.surface)
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun SmallPrecipitationGraphPreview() {
-    AppTheme {
-        PrecipitationGraph(
-            state = smallPreviewState,
-            args = GraphArgs.rememberPrecipitationArgs(),
-            max = smallPreviewState.points.maxOf { it.precip },
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4f / 3f)
-                .background(MaterialTheme.colorScheme.surface)
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun SmallPrecipitationGraphInchesPreview() {
-    AppTheme {
-        PrecipitationGraph(
-            state = smallPreviewStateInches,
-            args = GraphArgs.rememberPrecipitationArgs(),
-            max = smallPreviewStateInches.points.maxOf { it.precip },
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4f / 3f)
-                .background(MaterialTheme.colorScheme.surface)
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun PrecipitationGraphRtlPreview() {
-    AppTheme {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            PrecipitationGraph(
-                state = previewState,
-                args = GraphArgs.rememberPrecipitationArgs(),
-                max = previewState.points.maxOf { it.precip },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(4f / 3f)
-                    .background(MaterialTheme.colorScheme.surface)
-            )
+        Surface {
+            Column {
+                Text(providedState.first)
+                PrecipitationGraph(
+                    now = state.now,
+                    points = state.graphs.first().points,
+                    args = GraphArgs.rememberDefaultArgs(),
+                    max = state.max,
+                    modifier = Modifier.width(400.dp).height(300.dp)
+                )
+            }
         }
     }
 }
 
 @Preview
 @Composable
-private fun PrecipitationGraphDarkPreview() {
-    AppTheme(darkTheme = true) {
-        PrecipitationGraph(
-            state = previewState,
-            args = GraphArgs.rememberPrecipitationArgs(),
-            max = previewState.points.maxOf { it.precip },
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4f / 3f)
-                .background(MaterialTheme.colorScheme.surface)
-        )
+private fun PrecipitationGraphPreviewRtl(
+    @PreviewParameter(PrecipitationGraphsPreviewParameterProvider ::class) providedState: Pair<String, PrecipitationGraphs>
+) {
+    val state = providedState.second
+    AppTheme {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            Surface {
+                Column {
+                    Text(providedState.first)
+                    PrecipitationGraph(
+                        now = state.now,
+                        points = state.graphs.first().points,
+                        args = GraphArgs.rememberDefaultArgs(),
+                        max = state.max,
+                        modifier = Modifier.width(400.dp).height(300.dp)
+                    )
+                }
+            }
+        }
     }
 }
-
-private val previewState = PrecipitationGraph(
-    day = LocalDate.parse("1970-01-01"),
-    points = List(24) {
-        PrecipitationGraphPoint(
-            time = GraphTime(
-                hour = LocalDateTime.parse("1970-01-01T00:00")
-                    .plus(it.toLong(), ChronoUnit.HOURS),
-                now = LocalDateTime.parse("1970-01-01T08:00")
-            ),
-            precip = MixedPrecipitation(
-                rain = Rain(Random.nextDouble(until = 5.0), Precipitation.Unit.Millimeters),
-                snow = Snow(Random.nextDouble(until = 5.0), Precipitation.Unit.Millimeters),
-                showers = Showers(Random.nextDouble(until = 5.0), Precipitation.Unit.Millimeters),
-                unit = Precipitation.Unit.Millimeters
-            ),
-            cond = Condition(
-                wmoCode = Random.nextInt(0, 3),
-                isDay = Random.nextBoolean()
-            )
-        )
-    }
-)
-
-private val smallPreviewState = PrecipitationGraph(
-    day = LocalDate.parse("1970-01-01"),
-    points = List(24) {
-        PrecipitationGraphPoint(
-            time = GraphTime(
-                hour = LocalDateTime.parse("1970-01-01T00:00")
-                    .plus(it.toLong(), ChronoUnit.HOURS),
-                now = LocalDateTime.parse("1970-01-01T08:00")
-            ),
-            precip = MixedPrecipitation(
-                rain = Rain(Random.nextDouble(until = 5.0), Precipitation.Unit.Millimeters),
-                snow = Snow.ZeroMillimeters,
-                showers = Showers.ZeroMillimeters,
-                unit = Precipitation.Unit.Millimeters
-            ),
-            cond = Condition(
-                wmoCode = Random.nextInt(0, 3),
-                isDay = Random.nextBoolean()
-            )
-        )
-    }
-)
-
-private val smallPreviewStateInches = PrecipitationGraph(
-    day = LocalDate.parse("1970-01-01"),
-    points = List(24) {
-        PrecipitationGraphPoint(
-            time = GraphTime(
-                hour = LocalDateTime.parse("1970-01-01T00:00")
-                    .plus(it.toLong(), ChronoUnit.HOURS),
-                now = LocalDateTime.parse("1970-01-01T08:00")
-            ),
-            precip = MixedPrecipitation(
-                rain = Rain(1.0, Precipitation.Unit.Millimeters),
-                snow = Snow.ZeroMillimeters,
-                showers = Showers.ZeroMillimeters,
-                unit = Precipitation.Unit.Millimeters
-            ).convertTo(Precipitation.Unit.Inches),
-            cond = Condition(
-                wmoCode = Random.nextInt(0, 3),
-                isDay = Random.nextBoolean()
-            )
-        )
-    }
-)

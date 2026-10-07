@@ -12,21 +12,21 @@
 
 package com.davidtakac.bura.forecast.parameters.visibility
 
-import com.davidtakac.bura.forecast.HourMoment
-import java.time.LocalDateTime
+import com.davidtakac.bura.forecast.Moment
+import java.time.ZonedDateTime
 import java.util.Objects
 
 class VisibilityMoment(
-    hour: LocalDateTime,
+    timeZdt: ZonedDateTime,
     val visibility: Visibility,
-) : HourMoment(hour) {
-    override fun toString(): String = "$hour: $visibility"
+) : Moment(timeZdt) {
+    override fun toString(): String = "$timeZdt: $visibility"
 
     override fun equals(other: Any?): Boolean =
         other is VisibilityMoment
-                && other.hour == hour
+                && other.timeZdt == timeZdt
                 && other.visibility == visibility
 
     override fun hashCode(): Int =
-        Objects.hash(hour, visibility)
+        Objects.hash(timeZdt, visibility)
 }

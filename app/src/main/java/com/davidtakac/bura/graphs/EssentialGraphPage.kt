@@ -42,30 +42,33 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.davidtakac.bura.R
 import com.davidtakac.bura.common.compose.TextSkeleton
+import com.davidtakac.bura.forecast.parameters.precipitation.MixedPrecipitation
+import com.davidtakac.bura.forecast.parameters.temperature.Temperature
 import com.davidtakac.bura.graphs.common.GraphArgs
 import com.davidtakac.bura.graphs.common.compose.GraphScreenSectionLabel
+import com.davidtakac.bura.graphs.pop.PopGraph
 import com.davidtakac.bura.graphs.pop.compose.PopGraph
+import com.davidtakac.bura.graphs.precipitation.PrecipitationGraph
+import com.davidtakac.bura.graphs.precipitation.PrecipitationTotal
 import com.davidtakac.bura.graphs.precipitation.compose.PrecipitationBullets
 import com.davidtakac.bura.graphs.precipitation.compose.PrecipitationGraph
 import com.davidtakac.bura.graphs.precipitation.compose.TodayPrecipitationBullets
-import com.davidtakac.bura.graphs.precipitation.PrecipitationTotal
-import com.davidtakac.bura.graphs.temperature.compose.TemperatureGraph
-import com.davidtakac.bura.graphs.temperature.TemperatureGraphSummary
-import com.davidtakac.bura.forecast.parameters.precipitation.MixedPrecipitation
-import com.davidtakac.bura.summary.now.compose.NowSummarySkeleton
-import com.davidtakac.bura.forecast.parameters.temperature.Temperature
-import com.davidtakac.bura.graphs.pop.PopGraph
-import com.davidtakac.bura.graphs.precipitation.PrecipitationGraph
 import com.davidtakac.bura.graphs.temperature.TemperatureGraph
+import com.davidtakac.bura.graphs.temperature.TemperatureGraphSummary
+import com.davidtakac.bura.graphs.temperature.compose.TemperatureGraph
+import com.davidtakac.bura.graphs.temperature.compose.TemperatureGraphSummary
+import com.davidtakac.bura.summary.now.compose.NowSummarySkeleton
+import java.time.Instant
 
 private const val graphAspectRatio = 4f / 3f
-private val contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp)
 private val verticalSpacing = 24.dp
 private val graphLabelSpacing = 8.dp
 
 @Composable
 fun EssentialGraphPage(
     listState: LazyListState,
+    contentPadding: PaddingValues,
+    now: Instant,
     summary: TemperatureGraphSummary,
     temperatureGraph: TemperatureGraph,
     minTemp: Temperature,
@@ -89,16 +92,17 @@ fun EssentialGraphPage(
         modifier = Modifier.fillMaxSize()
     ) {
         item {
-            com.davidtakac.bura.graphs.temperature.compose.TemperatureGraphSummary(
+            TemperatureGraphSummary(
                 state = summary,
                 modifier = Modifier.fillMaxWidth()
             )
         }
         item {
             TemperatureGraph(
-                state = temperatureGraph,
-                absMinTemp = minTemp,
-                absMaxTemp = maxTemp,
+                now = now,
+                points = temperatureGraph.points,
+                min = minTemp,
+                max = maxTemp,
                 args = temperatureArgs,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -119,7 +123,8 @@ GraphScreenSectionLabel(stringResource(R.string.cond_screen_wind))
 WindGraph(state = windGraph, max = windMax, modifier = Modifier.fillMaxWidth().aspectRatio(graphAspectRatio).border(width = Dp.Hairline, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.onSurfaceVariant).clip(MaterialTheme.shapes.large))
 GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
                 PopGraph(
-                    state = popGraph,
+                    now = now,
+                    points = popGraph.points,
                     args = popArgs,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -137,7 +142,8 @@ GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
             Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
                 GraphScreenSectionLabel(stringResource(R.string.cond_screen_precip))
                 PrecipitationGraph(
-                    state = precipGraph,
+                    now = now,
+                    points = precipGraph.points,
                     max = precipMax,
                     args = precipArgs,
                     modifier = Modifier
@@ -176,7 +182,11 @@ GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
 }
 
 @Composable
-fun EssentialGraphPageLoadingIndicator(shimmerColor: State<Color>, modifier: Modifier = Modifier) {
+fun EssentialGraphPageLoadingIndicator(
+    shimmerColor: State<Color>,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(verticalSpacing),
