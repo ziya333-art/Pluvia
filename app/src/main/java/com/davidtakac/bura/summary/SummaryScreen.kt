@@ -172,12 +172,6 @@ private fun SummaryGrid(
             )
         }
         item(span = StaggeredGridItemSpan.FullLine) {
-            FeelsLikeSummary(
-                state = state.feelsLike,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item(span = StaggeredGridItemSpan.FullLine) {
             HourSummaryLazyRow(
                 state = state.hourly,
                 onClick = onHourlyClick,
@@ -228,7 +222,11 @@ private fun SummaryGrid(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        // Phase 3: MoonPhaseSummary pairs here beside Sun
+        item {
+            com.davidtakac.bura.summary.moon.compose.MoonPhase(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         item(span = StaggeredGridItemSpan.FullLine) {
             VisibilitySummary(
                 state = state.vis,

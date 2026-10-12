@@ -12,6 +12,16 @@
 
 <resources>
     <string name="app_name">Pluvia</string>
+    <string name="moon">Moon</string>
+    <string name="moon_new">New moon</string>
+    <string name="moon_waxing_crescent">Waxing crescent</string>
+    <string name="moon_first_quarter">First quarter</string>
+    <string name="moon_waxing_gibbous">Waxing gibbous</string>
+    <string name="moon_full">Full moon</string>
+    <string name="moon_waning_gibbous">Waning gibbous</string>
+    <string name="moon_last_quarter">Last quarter</string>
+    <string name="moon_waning_crescent">Waning crescent</string>
+    <string name="moon_illumination">Illumination %1$s%%</string>
     <string name="general_error_failed_to_download">Failed to download forecast. Connect to the Internet and try again.</string>
     <string name="general_error_outdated">Your forecast data has expired. Connect to the Internet and try again.</string>
     <string name="general_error_no_selected_place">No selected place.</string>
