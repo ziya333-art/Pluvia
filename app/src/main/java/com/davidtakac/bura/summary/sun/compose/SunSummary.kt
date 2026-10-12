@@ -49,36 +49,21 @@ fun SunSummary(state: SunSummary, modifier: Modifier = Modifier) {
     SummaryTile(
         label = { Text(stringResource(if (state is Sunrise) R.string.sunrise else R.string.sunset)) },
         value = {
+            CelestialDisc(isDay = state is Sunset)
+        },
+        supportingValue = {
             Text(
                 text = when (state) {
                     is Sunrise.WithSunsetSoon -> timeFormatter.format(state.time)
                     is Sunset.WithSunriseSoon -> timeFormatter.format(state.time)
-
-                    is Sunrise.Later -> dayFormatter.format(state.time).capitalize(locale)
-                    is Sunset.Later -> dayFormatter.format(state.time).capitalize(locale)
-
+                    is Sunrise.Later -> timeFormatter.format(state.time)
+                    is Sunset.Later -> timeFormatter.format(state.time)
                     is Sunrise.WithSunsetLater -> timeFormatter.format(state.time)
                     is Sunset.WithSunriseLater -> timeFormatter.format(state.time)
-
-                    is Sunrise.OutOfSight -> {
-                        val numberFormat = rememberNumberFormat()
-                        if (state.forDuration.toDays() < 1) stringResource(R.string.sunrise_value_more_than_hours_away, numberFormat.format(state.forDuration.toHours()))
-                        else stringResource(R.string.sunrise_value_more_than_days_away, numberFormat.format(state.forDuration.toDays()))
-                    }
-                    is Sunset.OutOfSight -> {
-                        val numberFormat = rememberNumberFormat()
-                        if (state.forDuration.toDays() < 1) stringResource(R.string.sunset_value_more_than_hours_away, numberFormat.format(state.forDuration.toHours()))
-                        else stringResource(R.string.sunset_value_more_than_days_away, numberFormat.format(state.forDuration.toDays()))
-                    }
+                    is Sunrise.OutOfSight -> stringResource(R.string.sunrise_not_today)
+                    is Sunset.OutOfSight -> stringResource(R.string.sunset_not_today)
                 }
             )
-        },
-        supportingValue = {
-            when (state) {
-                is Sunrise.Later -> Text(timeFormatter.format(state.time))
-                is Sunset.Later -> Text(timeFormatter.format(state.time))
-                else -> Unit
-            }
         },
         bottom = {
             Text(

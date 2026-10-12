@@ -172,6 +172,12 @@ private fun SummaryGrid(
             )
         }
         item(span = StaggeredGridItemSpan.FullLine) {
+            FeelsLikeSummary(
+                state = state.feelsLike,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        item(span = StaggeredGridItemSpan.FullLine) {
             HourSummaryLazyRow(
                 state = state.hourly,
                 onClick = onHourlyClick,
@@ -182,6 +188,12 @@ private fun SummaryGrid(
             DailySummaryColumn(
                 state = state.daily,
                 onDayClick = onDayClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        item(span = StaggeredGridItemSpan.FullLine) {
+            WindSummary(
+                state = state.wind,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -199,12 +211,6 @@ private fun SummaryGrid(
             )
         }
         item {
-            WindSummary(
-                state = state.wind,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
             PressureSummary(
                 state = state.pressure,
                 modifier = Modifier.fillMaxWidth()
@@ -217,20 +223,15 @@ private fun SummaryGrid(
             )
         }
         item {
-            VisibilitySummary(
-                state = state.vis,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
             SunSummary(
                 state = state.sun,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item {
-            FeelsLikeSummary(
-                state = state.feelsLike,
+        // Phase 3: MoonPhaseSummary pairs here beside Sun
+        item(span = StaggeredGridItemSpan.FullLine) {
+            VisibilitySummary(
+                state = state.vis,
                 modifier = Modifier.fillMaxWidth()
             )
         }

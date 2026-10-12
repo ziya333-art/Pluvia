@@ -27,7 +27,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -52,8 +51,9 @@ fun AppleTemperatureScale(
     val backgroundColor = MaterialTheme.colorScheme.surfaceVariant
     val nowColor = MaterialTheme.colorScheme.onSurface
     val nowOutlineThickness = with(LocalDensity.current) { 4.dp.toPx() }
-    val gradient = AppTheme.colors.temperatureColors(absMin, absMax)
-    val layoutDirection = LocalLayoutDirection.current
+    // Calm range: a single quiet tone instead of the full temperature gradient.
+    // Position carries the meaning; the color no longer shouts it.
+    val rangeColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
     val absMinValue = absMin.value
     val absMaxValue = absMax.value
     val minValue = min.value
@@ -64,11 +64,7 @@ fun AppleTemperatureScale(
             .height(6.dp)
             .then(modifier)
             .clip(RoundedCornerShape(percent = 100))
-            .background(Brush.horizontalGradient(
-                colors = gradient,
-                startX = if (layoutDirection == LayoutDirection.Ltr) 0f else Float.POSITIVE_INFINITY,
-                endX = if (layoutDirection == LayoutDirection.Ltr) Float.POSITIVE_INFINITY else 0f
-            ))
+            .background(rangeColor)
     ) {
         val range = absMaxValue - absMinValue
         val pillMinPerc = (minValue - absMinValue) / range

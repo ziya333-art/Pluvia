@@ -15,6 +15,8 @@ package com.davidtakac.bura.summary.wind.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -54,12 +56,27 @@ fun WindSummary(state: WindSummary, modifier: Modifier = Modifier) {
         label = { Text(text = stringResource(R.string.wind_label)) },
         value = {
             Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                ValueAndUnit(
-                    value = state.windNow.speed.valueString(),
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    ValueAndUnit(
+                        value = state.windNow.speed.valueString(),
+                        unit = state.windNow.speed.unitString(),
+                    )
+                    Text(
+                        text = state.windNow.from.compass.toString(),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                WindCompass(
+                    directionDegrees = state.windNow.from.degrees,
+                    speed = state.windNow.speed.valueString(),
                     unit = state.windNow.speed.unitString(),
+                    modifier = Modifier.size(120.dp)
                 )
             }
         },
