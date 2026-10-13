@@ -6,18 +6,15 @@ import com.davidtakac.bura.forecast.parameters.condition.Condition
 
 data class SkyBackdrop(val imageRes: Int, val glass: Color)
 
-fun weatherBackdrop(condition: Condition, hour: Int): SkyBackdrop {
+fun weatherBackdrop(condition: Condition, hour: Int, golden: Boolean): SkyBackdrop {
+    if (golden) {
+        return SkyBackdrop(R.drawable.sky_sunset, Color(0xFF3B4A6B))
+    }
     if (!condition.isDay) {
         return SkyBackdrop(R.drawable.sky_night, Color(0xFF2F6B58))
     }
-    if (hour in 5..8 || hour in 16..19) {
-        if (condition.wmoCode in 0..3) {
-            return SkyBackdrop(R.drawable.sky_sunset, Color(0xFF3B4A6B))
-        }
-    }
     return when (condition.wmoCode) {
-        in 0..1 -> if (condition.isDay) SkyBackdrop(R.drawable.sky_sunny, Color(0xFF8A6A5C))
-                   else SkyBackdrop(R.drawable.sky_night, Color(0xFF2F6B58))
+        in 0..1 -> SkyBackdrop(R.drawable.sky_sunny, Color(0xFF8A6A5C))
         2 -> SkyBackdrop(R.drawable.sky_partly_cloudy, Color(0xFFB49A76))
         3 -> SkyBackdrop(R.drawable.sky_cloudy, Color(0xFFA68A5F))
         45, 48 -> SkyBackdrop(R.drawable.sky_fog, Color(0xFF8A6666))

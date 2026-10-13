@@ -118,9 +118,18 @@ fun SummaryScreen(
             )
             when (it) {
                 is SummaryState.Success -> {
+                    val nowLt = java.time.LocalTime.now()
+                    val golden = when (val sun = it.sun) {
+                        is com.davidtakac.bura.summary.sun.Sunrise.WithSunsetSoon ->
+                            java.time.Duration.between(nowLt, sun.time).let { d -> !d.isNegative && d.toMinutes() <= 45 }
+                        is com.davidtakac.bura.summary.sun.Sunset.WithSunriseSoon ->
+                            java.time.Duration.between(nowLt, sun.time).let { d -> !d.isNegative && d.toMinutes() <= 45 }
+                        else -> false
+                    }
                     val sky = com.davidtakac.bura.theme.weatherBackdrop(
                         it.now.cond,
-                        java.time.ZonedDateTime.now().hour
+                        java.time.ZonedDateTime.now().hour,
+                        golden
                     )
                     androidx.compose.material3.MaterialTheme(
                         colorScheme = androidx.compose.material3.darkColorScheme(
@@ -135,12 +144,7 @@ fun SummaryScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     androidx.compose.foundation.Image(
-                        painter = androidx.compose.ui.res.painterResource(
-                            com.davidtakac.bura.theme.weatherBackdrop(
-                                it.now.cond,
-                                java.time.ZonedDateTime.now().hour
-                            ).imageRes
-                        ),
+                        painter = androidx.compose.ui.res.painterResource(sky.imageRes),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop
