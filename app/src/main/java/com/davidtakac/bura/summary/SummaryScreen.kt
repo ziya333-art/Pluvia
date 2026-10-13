@@ -117,29 +117,34 @@ fun SummaryScreen(
                 bottom = bottomContentPadding + 16.dp,
             )
             when (it) {
-                is SummaryState.Success -> androidx.compose.foundation.layout.Box(
+                is SummaryState.Success -> {
+                    val sky = com.davidtakac.bura.theme.weatherBackdrop(
+                        it.now.cond,
+                        java.time.ZonedDateTime.now().hour
+                    )
+                    androidx.compose.material3.MaterialTheme(
+                        colorScheme = androidx.compose.material3.darkColorScheme(
+                            surface = sky.glass.copy(alpha = 0.72f),
+                            surfaceVariant = sky.glass.copy(alpha = 0.45f),
+                            surfaceContainer = sky.glass.copy(alpha = 0.72f),
+                            surfaceContainerHigh = sky.glass.copy(alpha = 0.72f),
+                            background = androidx.compose.ui.graphics.Color.Transparent
+                        )
+                    ) {
+                    androidx.compose.foundation.layout.Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     androidx.compose.foundation.Image(
                         painter = androidx.compose.ui.res.painterResource(
-                            com.davidtakac.bura.theme.weatherBackdropRes(
+                            com.davidtakac.bura.theme.weatherBackdrop(
                                 it.now.cond,
                                 java.time.ZonedDateTime.now().hour
-                            )
+                            ).imageRes
                         ),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop
                     )
-                    if (androidx.compose.foundation.isSystemInDarkTheme()) {
-                        androidx.compose.foundation.layout.Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.55f)
-                                )
-                        )
-                    }
                     SummaryGrid(
                         state = it,
                         onHourlyClick = onHourlySectionClick,
@@ -148,6 +153,8 @@ fun SummaryScreen(
                         contentPadding = gridContentPadding,
                         modifier = Modifier.fillMaxSize()
                     )
+                }
+                }
                 }
 
                 SummaryState.Loading, SummaryState.Initial -> SummaryScreenSkeleton(

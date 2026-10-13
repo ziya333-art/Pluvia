@@ -76,7 +76,8 @@ fun SummaryTile(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = if (minWidth < 300.dp) minWidth else 64.dp),
-                tonalElevation = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                tonalElevation = 0.dp,
                 shape = MaterialTheme.shapes.medium,
                 onClick = onClick,
                 content = content
@@ -86,7 +87,8 @@ fun SummaryTile(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = if (minWidth < 300.dp) minWidth else 64.dp),
-                tonalElevation = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                tonalElevation = 0.dp,
                 shape = MaterialTheme.shapes.medium,
                 content = content
             )
