@@ -124,10 +124,10 @@ fun SummaryScreen(
                     )
                     androidx.compose.material3.MaterialTheme(
                         colorScheme = androidx.compose.material3.darkColorScheme(
-                            surface = sky.glass.copy(alpha = 0.42f),
-                            surfaceVariant = sky.glass.copy(alpha = 0.28f),
-                            surfaceContainer = sky.glass.copy(alpha = 0.42f),
-                            surfaceContainerHigh = sky.glass.copy(alpha = 0.42f),
+                            surface = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.38f),
+                            surfaceVariant = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.38f),
+                            surfaceContainer = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.38f),
+                            surfaceContainerHigh = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.38f),
                             background = androidx.compose.ui.graphics.Color.Transparent
                         )
                     ) {
