@@ -2,13 +2,13 @@ package com.davidtakac.bura.summary.moon.compose
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidtakac.bura.R
@@ -23,6 +23,8 @@ import kotlin.math.roundToInt
 
 private const val SYNODIC = 29.530588853
 private val REF_NEW_MOON: Instant = Instant.parse("2000-01-06T18:14:00Z")
+private val MoonLit = Color(0xFFF5F2E8)
+private val MoonDark = Color(0xFF39414F)
 
 private fun moonAge(now: Instant): Double {
     val days = Duration.between(REF_NEW_MOON, now).seconds / 86400.0
@@ -49,19 +51,17 @@ internal fun MoonDisc(
     illumination: Double,
     modifier: Modifier = Modifier
 ) {
-    val dark = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
-    val lit = MaterialTheme.colorScheme.primary
     Canvas(modifier = modifier.size(96.dp)) {
         val r = size.minDimension / 2
         val c = center
         val waxing = phaseFraction < 0.5
-        drawCircle(dark, r, c)
         val litStart = if (waxing) -90f else 90f
-        drawArc(lit, litStart, 180f, true, Offset(c.x - r, c.y - r), Size(2 * r, 2 * r))
-        val e = (2 * illumination - 1).toFloat()
-        val rx = r * abs(e)
-        val ellipseColor = if (e < 0) dark else lit
-        drawArc(ellipseColor, litStart, 180f, true, Offset(c.x - rx, c.y - r), Size(2 * rx, 2 * r))
+        drawCircle(MoonDark, r, c)
+        drawArc(MoonLit, litStart, 180f, true, Offset(c.x - r, c.y - r), Size(2f * r, 2f * r))
+        val k = (2f * illumination.toFloat()) - 1f
+        val rx = r * abs(k)
+        val terminator = if (k < 0f) MoonDark else MoonLit
+        drawArc(terminator, litStart, 180f, true, Offset(c.x - rx, c.y - r), Size(2f * rx, 2f * r))
     }
 }
 

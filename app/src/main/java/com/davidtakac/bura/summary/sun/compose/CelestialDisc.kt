@@ -17,8 +17,8 @@ internal fun CelestialDisc(
     isDay: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val ink = MaterialTheme.colorScheme.onSurface
-    val accent = MaterialTheme.colorScheme.primary
+    val ink = Color(0xFFF5F2E8)
+    val accent = Color(0xFFF6C445)
     Canvas(modifier = modifier.size(96.dp)) {
         val c = center
         val r = size.minDimension * 0.28f
