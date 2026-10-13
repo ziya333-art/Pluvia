@@ -9,7 +9,7 @@ data class SkyBackdrop(val imageRes: Int, val glass: Color)
 fun weatherBackdrop(condition: Condition, hour: Int): SkyBackdrop {
     if (hour in 5..8 || hour in 17..20) {
         if (condition.wmoCode in 0..3) {
-            return SkyBackdrop(R.drawable.sky_sunset, Color(0xFF696969))
+            return SkyBackdrop(R.drawable.sky_sunset, Color(0xFF3B4A6B))
         }
     }
     return when (condition.wmoCode) {

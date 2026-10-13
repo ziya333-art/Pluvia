@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
 import kotlin.math.cos
 import kotlin.math.sin
@@ -37,21 +38,17 @@ internal fun CelestialDisc(
             }
         } else {
             drawCircle(Color(0xFF39414F), r, c)
-            drawCircle(ink, r, c)
-            drawCircle(
-                color = Color(0xFF39414F),
-                radius = r * 0.85f,
-                center = Offset(c.x + r * 0.5f, c.y - r * 0.35f)
-            )
-            for (i in 0 until 8) {
-                val a = Math.toRadians(i * 45.0 + 22.0)
-                val rr = r * 2.1f
-                drawCircle(
-                    ink.copy(alpha = 0.6f),
-                    2.2f * density,
-                    Offset(c.x + cos(a).toFloat() * rr, c.y + sin(a).toFloat() * rr)
-                )
+            val crescent = Path().apply {
+                addOval(androidx.compose.ui.geometry.Rect(c.x - r, c.y - r, c.x + r, c.y + r))
+                addOval(androidx.compose.ui.geometry.Rect(
+                    c.x - r * 0.3f,
+                    c.y - r,
+                    c.x + r * 1.7f,
+                    c.y + r
+                ))
+                fillType = androidx.compose.ui.graphics.PathFillType.EvenOdd
             }
+            drawPath(crescent, ink)
         }
     }
 }
