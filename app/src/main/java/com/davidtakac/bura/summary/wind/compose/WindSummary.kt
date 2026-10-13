@@ -76,7 +76,7 @@ fun WindSummary(state: WindSummary, modifier: Modifier = Modifier) {
                     directionDegrees = state.windNow.from.degrees,
                     speed = state.windNow.speed.valueString(),
                     unit = state.windNow.speed.unitString(),
-                    modifier = Modifier.size(120.dp)
+                    modifier = Modifier.size(150.dp)
                 )
             }
         },

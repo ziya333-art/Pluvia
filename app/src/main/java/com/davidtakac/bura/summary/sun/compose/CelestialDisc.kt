@@ -36,12 +36,12 @@ internal fun CelestialDisc(
                 )
             }
         } else {
+            drawCircle(Color(0xFF39414F), r, c)
             drawCircle(ink, r, c)
             drawCircle(
-                color = Color.Black,
+                color = Color(0xFF39414F),
                 radius = r * 0.85f,
-                center = Offset(c.x + r * 0.5f, c.y - r * 0.35f),
-                blendMode = BlendMode.Clear
+                center = Offset(c.x + r * 0.5f, c.y - r * 0.35f)
             )
             for (i in 0 until 8) {
                 val a = Math.toRadians(i * 45.0 + 22.0)

@@ -13,6 +13,7 @@
 package com.davidtakac.bura.summary
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -21,9 +22,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -116,14 +117,38 @@ fun SummaryScreen(
                 bottom = bottomContentPadding + 16.dp,
             )
             when (it) {
-                is SummaryState.Success -> SummaryGrid(
-                    state = it,
-                    onHourlyClick = onHourlySectionClick,
-                    onDayClick = onDayClick,
-                    onPrecipitationClick = onPrecipitationClick,
-                    contentPadding = gridContentPadding,
+                is SummaryState.Success -> androidx.compose.foundation.layout.Box(
                     modifier = Modifier.fillMaxSize()
-                )
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(
+                            com.davidtakac.bura.theme.weatherBackdropRes(
+                                it.now.cond,
+                                java.time.ZonedDateTime.now().hour
+                            )
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                    if (androidx.compose.foundation.isSystemInDarkTheme()) {
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.55f)
+                                )
+                        )
+                    }
+                    SummaryGrid(
+                        state = it,
+                        onHourlyClick = onHourlySectionClick,
+                        onDayClick = onDayClick,
+                        onPrecipitationClick = onPrecipitationClick,
+                        contentPadding = gridContentPadding,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
                 SummaryState.Loading, SummaryState.Initial -> SummaryScreenSkeleton(
                     contentPadding = gridContentPadding,
@@ -158,34 +183,34 @@ private fun SummaryGrid(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    LazyVerticalStaggeredGrid(
+    LazyVerticalGrid(
         modifier = modifier,
-        verticalItemSpacing = 16.dp,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        columns = StaggeredGridCells.Fixed(2),
+        columns = GridCells.Fixed(2),
         contentPadding = contentPadding,
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             NowSummary(
                 state = state.now,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             HourSummaryLazyRow(
                 state = state.hourly,
                 onClick = onHourlyClick,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             DailySummaryColumn(
                 state = state.daily,
                 onDayClick = onDayClick,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             WindSummary(
                 state = state.wind,
                 modifier = Modifier.fillMaxWidth()
@@ -227,13 +252,13 @@ private fun SummaryGrid(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             VisibilitySummary(
                 state = state.vis,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Text(
                 text = stringResource(id = R.string.credit_weather),
                 style = MaterialTheme.typography.bodyMedium,
