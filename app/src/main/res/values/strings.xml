@@ -256,4 +256,11 @@
     <string name="searched_place_edit_tz_description_value">%1$s\'s time zone is \"%2$s\" which is not recognized by your device. To use this location, set its time zone manually.</string>
     <string name="searched_place_edit_tz_hint">Search time zones…</string>
     <string name="searched_place_edit_tz_no_search_results_value">No matching time zones for \"%1$s\"</string>
+    <string name="pressure_gauge_low">Low</string>
+    <string name="pressure_gauge_high">High</string>
+    <string name="briefing_temperature">Temperatures range from %1$s to %2$s. The warmest part of the day is around %3$s.</string>
+    <string name="briefing_wind">Winds up to %1$s with gusts to %2$s, peaking around %3$s.</string>
+    <string name="briefing_uv">Peaking at %1$s around %2$s.</string>
+    <string name="briefing_pop">Chance of precipitation peaks at %1$s around %2$s.</string>
+    <string name="briefing_daily_summary">Daily Summary</string>
 </resources>

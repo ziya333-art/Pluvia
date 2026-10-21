@@ -240,6 +240,7 @@ private fun Pager(
                 windMax = state.windGraphs.max,
                 uvIndexGraph = state.uvIndexGraphs.graphs[page],
                 uvIndexMax = state.uvIndexGraphs.max,
+                briefing = state.briefings[page],
                 precipGraph = state.precipGraphs.graphs[page],
                 precipMax = state.precipGraphs.max,
                 precipArgs = GraphArgs.rememberDefaultArgs(),

@@ -43,6 +43,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidtakac.bura.graphs.common.GraphArgs
 import com.davidtakac.bura.graphs.wind.WindGraph
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.geometry.Size
+import com.davidtakac.bura.graphs.common.Curve
+import com.davidtakac.bura.graphs.common.scrubGesture
 import com.davidtakac.bura.forecast.parameters.wind.WindSpeed
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -56,7 +63,6 @@ fun WindGraph(
 
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     if (state.points.isEmpty()) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Text(
@@ -73,24 +79,20 @@ fun WindGraph(
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val timeFormatter = remember { DateTimeFormatter.ofPattern("HH:mm") }
     val measurer = rememberTextMeasurer()
-    val linePath = remember { Path() }
-    val fillPath = remember { Path() }
-    var selectedIndex by remember(state) { mutableStateOf(-1) }
+    val curve = remember(state) { Curve(points.map { it.speed.value }) }
     val maxIdx = points.indices.maxByOrNull { points[it].speed.value } ?: 0
     val maxLabelText = points[maxIdx].speed.string()
+    var scrub by remember(state) { mutableStateOf<Float?>(null) }
 
     Column(modifier = modifier.padding(10.dp)) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .pointerInput(points) {
-                    detectTapGestures { offset ->
-                        val usable = size.width.toFloat()
-                        val step =
-                            if (points.size > 1) usable / (points.size - 1) else usable
-                        selectedIndex =
-                            ((offset.x / step).roundToInt()).coerceIn(0, points.lastIndex)
+                .scrubGesture { x, w ->
+                    scrub = x?.let { px ->
+                        val step = if (points.size > 1) w / (points.size - 1) else w
+                        (px / step).coerceIn(0f, points.lastIndex.toFloat())
                     }
                 }
         ) {
@@ -99,24 +101,33 @@ fun WindGraph(
             val plotH = size.height - axisTop - axisBottom
             if (plotH <= 0f) return@Canvas
             val maxVal = max.value.takeIf { it > 0.0 } ?: 1.0
-            val step =
-                if (points.size > 1) size.width / (points.size - 1) else 0f
+            val step = if (points.size > 1) size.width / (points.size - 1) else 0f
             fun x(i: Int) = i * step
-            fun y(speed: WindSpeed) = axisTop + plotH - (speed.value / maxVal * plotH).toFloat()
+            fun y(v: Double) = axisTop + plotH - (v / maxVal * plotH).toFloat()
 
-            linePath.reset()
-            fillPath.reset()
-            points.forEachIndexed { i, p ->
-                val px = x(i)
-                val py = y(p.speed)
-                if (i == 0) linePath.moveTo(px, py) else linePath.lineTo(px, py)
-            }
-            fillPath.addPath(linePath)
-            fillPath.lineTo(x(points.lastIndex), axisTop + plotH)
-            fillPath.lineTo(x(0), axisTop + plotH)
-            fillPath.close()
-            drawPath(fillPath, color = primary.copy(alpha = 0.15f))
-            drawPath(linePath, color = primary, style = Stroke(width = 2.dp.toPx()))
+            val xs = points.indices.map { x(it) }
+            val ys = points.map { y(it.speed.value) }
+            val linePath = Path()
+            val fillPath = Path()
+            curve.trace(xs, ys, linePath, fillPath, baseY = axisTop + plotH)
+
+            drawPath(
+                path = fillPath,
+                brush = Brush.verticalGradient(
+                    colors = listOf(primary.copy(alpha = 0.30f), primary.copy(alpha = 0.03f)),
+                    startY = axisTop,
+                    endY = axisTop + plotH
+                )
+            )
+            drawPath(
+                path = linePath,
+                brush = Brush.verticalGradient(
+                    colors = listOf(primary, primary.copy(alpha = 0.55f)),
+                    startY = axisTop,
+                    endY = axisTop + plotH
+                ),
+                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+            )
 
             val nowIdx = points.indexOfLast { !it.datetime.isAfter(now) }
             if (nowIdx in 0 until points.lastIndex) {
@@ -129,13 +140,12 @@ fun WindGraph(
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 4f))
                 )
                 drawRect(
-                    color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.05f),
+                    color = Color.Black.copy(alpha = 0.05f),
                     topLeft = Offset(0f, axisTop),
-                    size = androidx.compose.ui.geometry.Size(nx, plotH)
+                    size = Size(nx, plotH)
                 )
             }
             points.forEachIndexed { i, p ->
-                drawCircle(color = primary, radius = 2.5.dp.toPx(), center = Offset(x(i), y(p.speed)))
                 if (p.datetime.hour % 6 == 0) {
                     drawText(
                         textMeasurer = measurer,
@@ -145,7 +155,6 @@ fun WindGraph(
                     )
                 }
             }
-            val maxIdx = points.indices.maxByOrNull { points[it].speed.value } ?: 0
             val maxLabel = measurer.measure(
                 maxLabelText,
                 TextStyle(fontSize = 10.sp, color = onSurfaceVariant)
@@ -154,24 +163,40 @@ fun WindGraph(
                 textLayoutResult = maxLabel,
                 topLeft = Offset(
                     x(maxIdx) - maxLabel.size.width / 2f,
-                    y(points[maxIdx].speed) - maxLabel.size.height - 4.dp.toPx()
+                    y(points[maxIdx].speed.value) - maxLabel.size.height - 4.dp.toPx()
                 )
             )
+
+            val s = scrub
+            if (s != null) {
+                val cx = s * step
+                drawLine(
+                    color = Color.White.copy(alpha = 0.7f),
+                    start = Offset(cx, axisTop),
+                    end = Offset(cx, axisTop + plotH),
+                    strokeWidth = 1.5.dp.toPx()
+                )
+                val cy = y(curve.at(s))
+                drawCircle(color = Color.Black.copy(alpha = 0.4f), radius = 7.dp.toPx(), center = Offset(cx, cy))
+                drawCircle(color = Color.White, radius = 5.dp.toPx(), center = Offset(cx, cy))
+            }
         }
         val shownIdx =
-            if (selectedIndex >= 0) selectedIndex
-            else points.indexOfLast { !it.datetime.isAfter(now) }.coerceAtLeast(0)
-        val shown = points[shownIdx]
-        Text(
-            text = shown.datetime.format(timeFormatter) +
-                " · " + shown.speed.string() +
-                " · " + shown.speed.bftString(),
-            style = MaterialTheme.typography.labelMedium,
-            color = onSurfaceVariant,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 6.dp),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
+            scrub?.roundToInt()
+                ?: points.indexOfLast { !it.datetime.isAfter(now) }.coerceAtLeast(0)
+        val shown = points.getOrNull(shownIdx)
+        if (shown != null) {
+            Text(
+                text = shown.datetime.format(timeFormatter) +
+                    " · " + shown.speed.string() +
+                    " · " + shown.speed.bftString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
     }
 }

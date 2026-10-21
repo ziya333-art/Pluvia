@@ -103,6 +103,7 @@ class EssentialGraphsViewModel(
         val uvIndexGraphs = getUvIndexGraphs(now = now, uvIndexPeriod = forecast.uvIndex) ?: return EssentialGraphsState.Outdated
         val condNow = forecast.condition.day ?: forecast.condition.night ?: return EssentialGraphsState.Outdated
         val backdrop = weatherBackdrop(condNow, now.hour, golden = false)
+        val briefings = tempGraphSummaries.map { getDayBriefing(it.day, forecast.temperature, forecast.gust, windPeriod = forecast.wind, uvIndexPeriod = forecast.uvIndex, popPeriod = forecast.pop) }
         return EssentialGraphsState.Success(
             tempGraphSummaries = tempGraphSummaries,
             tempGraphs = tempGraphs,
@@ -111,7 +112,8 @@ class EssentialGraphsViewModel(
             precipTotals = precipTotals,
             windGraphs = windGraphs,
             uvIndexGraphs = uvIndexGraphs,
-            backdrop = backdrop
+            backdrop = backdrop,
+            briefings = briefings
         )
     }
 
@@ -140,7 +142,8 @@ sealed interface EssentialGraphsState {
         val precipTotals: List<PrecipitationTotal>,
         val windGraphs: WindGraphs,
         val uvIndexGraphs: UvIndexGraphs,
-        val backdrop: SkyBackdrop
+        val backdrop: SkyBackdrop,
+        val briefings: List<DayBriefing>
     ) : EssentialGraphsState
 
     data object Loading : EssentialGraphsState

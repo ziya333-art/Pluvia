@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -75,7 +76,8 @@ fun SummaryTile(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = if (minWidth < 300.dp) minWidth else 64.dp),
+                    .heightIn(min = if (minWidth < 300.dp) minWidth else 64.dp)
+                    .fillMaxHeight(),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 tonalElevation = 0.dp,
                 shape = MaterialTheme.shapes.medium,
@@ -86,7 +88,8 @@ fun SummaryTile(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = if (minWidth < 300.dp) minWidth else 64.dp),
+                    .heightIn(min = if (minWidth < 300.dp) minWidth else 64.dp)
+                    .fillMaxHeight(),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 tonalElevation = 0.dp,
                 shape = MaterialTheme.shapes.medium,

@@ -15,6 +15,8 @@ package com.davidtakac.bura.summary.pressure.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,34 +50,12 @@ fun PressureSummary(state: PressureSummary, modifier: Modifier = Modifier) {
     SummaryTile(
         label = { Text(stringResource(R.string.pressure)) },
         value = {
-            ValueAndUnit(
-                value = state.now.valueString(),
-                unit = state.now.unitString()
+            PressureGauge(
+                state = state,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
             )
-        },
-        supportingValue = {
-            val style = LocalTextStyle.current
-            val inlineContentMap = mapOf(
-                "trend" to InlineTextContent(
-                    placeholder = Placeholder(
-                        width = style.fontSize,
-                        height = style.fontSize,
-                        placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
-                    )
-                ) {
-                    Icon(
-                        painter = state.trend.image(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            )
-            val annotatedString = buildAnnotatedString {
-                append(state.trend.string())
-                append(" ")
-                appendInlineContent(id = "trend")
-            }
-            Text(text = annotatedString, inlineContent = inlineContentMap)
         },
         bottom = { Text(stringResource(R.string.pressure_value_average, state.average.string())) },
         modifier = modifier

@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -45,6 +46,11 @@ import com.davidtakac.bura.common.compose.TextSkeleton
 import com.davidtakac.bura.forecast.parameters.precipitation.MixedPrecipitation
 import com.davidtakac.bura.forecast.parameters.temperature.Temperature
 import com.davidtakac.bura.graphs.common.GraphArgs
+import androidx.compose.ui.text.font.FontStyle
+import com.davidtakac.bura.common.compose.rememberDateTimeHourMinuteFormatter
+import com.davidtakac.bura.forecast.parameters.temperature.string as tempValueString
+import com.davidtakac.bura.forecast.parameters.uvindex.valueString as uvValueString
+import com.davidtakac.bura.forecast.parameters.wind.valueString as windValueString
 import com.davidtakac.bura.graphs.common.compose.GraphScreenSectionLabel
 import com.davidtakac.bura.graphs.pop.PopGraph
 import com.davidtakac.bura.graphs.pop.compose.PopGraph
@@ -70,6 +76,7 @@ fun EssentialGraphPage(
     contentPadding: PaddingValues,
     now: Instant,
     metric: GraphMetric?,
+    briefing: DayBriefing?,
     summary: TemperatureGraphSummary,
     temperatureGraph: TemperatureGraph,
     minTemp: Temperature,
@@ -214,6 +221,11 @@ fun EssentialGraphPage(
                 }
             }
         }
+        if (metric != null) {
+            item {
+                BriefingText(briefing = briefing, metric = metric)
+            }
+        }
         item {
             Text(
                 text = stringResource(id = R.string.credit_weather),
@@ -221,6 +233,67 @@ fun EssentialGraphPage(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Composable
+private fun BriefingText(briefing: DayBriefing?, metric: GraphMetric?) {
+    if (briefing == null) return
+    val formatter = rememberDateTimeHourMinuteFormatter()
+    val text = when (metric) {
+        GraphMetric.Temperature -> {
+            val max = briefing.tempMax ?: return
+            stringResource(
+                R.string.briefing_temperature,
+                (briefing.tempMin ?: max).tempValueString(),
+                max.tempValueString(),
+                briefing.tempMaxAt?.let { formatter.format(it.toLocalTime()) } ?: ""
+            )
+        }
+        GraphMetric.Wind -> {
+            val wind = briefing.windMax ?: return
+            val gust = briefing.gustMax ?: return
+            stringResource(
+                R.string.briefing_wind,
+                wind.windValueString(),
+                gust.windValueString(),
+                briefing.gustMaxAt?.let { formatter.format(it.toLocalTime()) } ?: ""
+            )
+        }
+        GraphMetric.UvIndex -> {
+            val uv = briefing.uvMax ?: return
+            stringResource(
+                R.string.briefing_uv,
+                uv.uvValueString(),
+                briefing.uvMaxAt?.let { formatter.format(it.toLocalTime()) } ?: ""
+            )
+        }
+        GraphMetric.Precipitation, GraphMetric.Pop -> {
+            val pop = briefing.popMax ?: return
+            stringResource(
+                R.string.briefing_pop,
+                stringResource(R.string.pop_value_percent, pop),
+                briefing.popMaxAt?.let { formatter.format(it.toLocalTime()) } ?: ""
+            )
+        }
+        else -> return
+    }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.briefing_daily_summary),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(14.dp)
+        )
     }
 }
 

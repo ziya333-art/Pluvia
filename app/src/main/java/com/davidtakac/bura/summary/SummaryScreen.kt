@@ -23,6 +23,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import com.davidtakac.bura.summary.common.compose.MatchedHeightRow
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -248,42 +253,57 @@ private fun SummaryGrid(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item {
-            PrecipitationSummary(
-                state = state.precip,
-                onClick = onPrecipitationClick,
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            MatchedHeightRow(
+                spacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                PrecipitationSummary(
+                    state = state.precip,
+                    onClick = onPrecipitationClick,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+                UvIndexSummary(
+                    state = state.uvIndex,
+                    onClick = onUvIndexClick,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+            }
         }
-        item {
-            UvIndexSummary(
-                state = state.uvIndex,
-                onClick = onUvIndexClick,
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            MatchedHeightRow(
+                spacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                PressureSummary(
+                    state = state.pressure,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+                HumiditySummary(
+                    state = state.humidity,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+            }
         }
-        item {
-            PressureSummary(
-                state = state.pressure,
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            MatchedHeightRow(
+                spacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
-            HumiditySummary(
-                state = state.humidity,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
-            SunSummary(
-                state = state.sun,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
-            com.davidtakac.bura.summary.moon.compose.MoonPhase(
-                modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                SunSummary(
+                    state = state.sun,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+                com.davidtakac.bura.summary.moon.compose.MoonPhase(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+            }
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             VisibilitySummary(
