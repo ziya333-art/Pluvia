@@ -12,7 +12,9 @@
 
 package com.davidtakac.bura.common.util
 
+import android.util.Log
 import com.davidtakac.bura.unexpectederror.UnexpectedErrorSetter
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -31,7 +33,10 @@ fun CoroutineScope.launchCatching(
     ) {
         try {
             block()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
+            Log.e(null, null, e)
             unexpectedErrorSetter.set(e)
         }
     }

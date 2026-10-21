@@ -25,10 +25,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -56,8 +59,10 @@ import com.davidtakac.bura.summary.sun.compose.SunSummary
 import com.davidtakac.bura.summary.uvindex.compose.UvIndexSummary
 import com.davidtakac.bura.summary.visibility.compose.VisibilitySummary
 import com.davidtakac.bura.summary.wind.compose.WindSummary
+import com.davidtakac.bura.theme.NavBarProtectionColor
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryScreen(
     summaryState: SummaryState,
@@ -79,11 +84,20 @@ fun SummaryScreen(
 
     onTryAgainClick: () -> Unit,
     onSelectPlaceClick: () -> Unit,
+    onBackgroundColorChange: (NavBarProtectionColor) -> Unit,
 ) {
+    val searchBarColors = SearchBarDefaults.colors()
+    LaunchedEffect(searchActive) {
+        onBackgroundColorChange(
+            if (searchActive) NavBarProtectionColor.Custom(searchBarColors.containerColor)
+            else NavBarProtectionColor.Default
+        )
+    }
     Scaffold(
         topBar = {
             PlacePickerSearchBar(
                 state = pickerState,
+                searchBarColors = searchBarColors,
                 query = searchQuery,
                 onQueryChange = onSearchQueryChange,
                 onQueryClearClick = onSearchQueryClearClick,
