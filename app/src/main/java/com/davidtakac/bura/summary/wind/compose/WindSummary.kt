@@ -51,8 +51,9 @@ import com.davidtakac.bura.forecast.parameters.wind.valueString
 import com.davidtakac.bura.summary.wind.WindSummary
 
 @Composable
-fun WindSummary(state: WindSummary, modifier: Modifier = Modifier) {
+fun WindSummary(state: WindSummary, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     SummaryTile(
+        onClick = onClick,
         label = { Text(text = stringResource(R.string.wind_label)) },
         value = {
             Row(

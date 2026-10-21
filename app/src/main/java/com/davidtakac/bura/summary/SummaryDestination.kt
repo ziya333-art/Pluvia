@@ -31,6 +31,8 @@ fun SummaryDestination(
     onDayClick: (LocalDate) -> Unit,
     onSettingsButtonClick: () -> Unit,
     onPrecipitationClick: () -> Unit,
+    onWindClick: () -> Unit,
+    onUvIndexClick: () -> Unit,
     onSearchedPlaceEditRequest: () -> Unit,
     onBackgroundColorChange: (NavBarProtectionColor) -> Unit,
 ) {
@@ -66,6 +68,8 @@ fun SummaryDestination(
         onDayClick = onDayClick,
         onSettingsButtonClick = onSettingsButtonClick,
         onPrecipitationClick = onPrecipitationClick,
+        onWindClick = onWindClick,
+        onUvIndexClick = onUvIndexClick,
 
         pickerState = pickerState,
         searchQuery = pickerState.query,

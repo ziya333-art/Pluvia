@@ -36,6 +36,8 @@ import com.davidtakac.bura.graphs.temperature.getTemperatureGraphSummaries
 import com.davidtakac.bura.graphs.temperature.getTemperatureGraphs
 import com.davidtakac.bura.places.selected.SelectedPlaceRepository
 import com.davidtakac.bura.unexpectederror.UnexpectedErrorSetter
+import com.davidtakac.bura.theme.SkyBackdrop
+import com.davidtakac.bura.theme.weatherBackdrop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.Instant
@@ -99,6 +101,8 @@ class EssentialGraphsViewModel(
 
         val windGraphs = getWindGraphs(now = now, windPeriod = forecast.wind) ?: return EssentialGraphsState.Outdated
         val uvIndexGraphs = getUvIndexGraphs(now = now, uvIndexPeriod = forecast.uvIndex) ?: return EssentialGraphsState.Outdated
+        val condNow = forecast.condition.day ?: forecast.condition.night ?: return EssentialGraphsState.Outdated
+        val backdrop = weatherBackdrop(condNow, now.hour, golden = false)
         return EssentialGraphsState.Success(
             tempGraphSummaries = tempGraphSummaries,
             tempGraphs = tempGraphs,
@@ -106,7 +110,8 @@ class EssentialGraphsViewModel(
             precipGraphs = precipGraphs,
             precipTotals = precipTotals,
             windGraphs = windGraphs,
-            uvIndexGraphs = uvIndexGraphs
+            uvIndexGraphs = uvIndexGraphs,
+            backdrop = backdrop
         )
     }
 
@@ -134,7 +139,8 @@ sealed interface EssentialGraphsState {
         val precipGraphs: PrecipitationGraphs,
         val precipTotals: List<PrecipitationTotal>,
         val windGraphs: WindGraphs,
-        val uvIndexGraphs: UvIndexGraphs
+        val uvIndexGraphs: UvIndexGraphs,
+        val backdrop: SkyBackdrop
     ) : EssentialGraphsState
 
     data object Loading : EssentialGraphsState

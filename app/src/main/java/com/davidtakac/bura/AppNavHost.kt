@@ -12,6 +12,8 @@
 
 package com.davidtakac.bura
 
+import com.davidtakac.bura.graphs.GraphMetric
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -66,17 +68,19 @@ fun AppNavHost(
     NavHost(navController = controller, startDestination = "summary") {
         composable("summary") {
             SummaryDestination(
+                onWindClick = { controller.navigate("essential-graphs?metric=wind") },
+                onUvIndexClick = { controller.navigate("essential-graphs?metric=uv") },
                 onHourlySectionClick = {
-                    controller.navigate("essential-graphs")
+                    controller.navigate("essential-graphs?metric=temperature")
                 },
                 onDayClick = {
-                    controller.navigate("essential-graphs?initialDay=$it")
+                    controller.navigate("essential-graphs?initialDay=$it&metric=temperature")
                 },
                 onSettingsButtonClick = {
                     controller.navigate("settings")
                 },
                 onPrecipitationClick = {
-                    controller.navigate("essential-graphs")
+                    controller.navigate("essential-graphs?metric=precipitation")
                 },
                 onSearchedPlaceEditRequest = {
                     controller.navigate("searched-place-edit")
@@ -97,9 +101,14 @@ fun AppNavHost(
             )
         }
         composable(
-            route = "essential-graphs?initialDay={initialDay}",
+            route = "essential-graphs?initialDay={initialDay}&metric={metric}",
             arguments = listOf(
                 navArgument("initialDay") {
+                    nullable = true
+                    defaultValue = null
+                    type = NavType.StringType
+                },
+                navArgument("metric") {
                     nullable = true
                     defaultValue = null
                     type = NavType.StringType
@@ -108,6 +117,7 @@ fun AppNavHost(
         ) { backStackEntry ->
             EssentialGraphsDestination(
                 initialDay = backStackEntry.arguments?.getString("initialDay")?.let(LocalDate::parse),
+                metric = GraphMetric.fromRoute(backStackEntry.arguments?.getString("metric")),
                 onSelectPlaceClick = controller::navigateUp,
                 onBackClick = controller::navigateUp
             )

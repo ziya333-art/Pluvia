@@ -70,6 +70,8 @@ fun SummaryScreen(
     onDayClick: (date: LocalDate) -> Unit,
     onSettingsButtonClick: () -> Unit,
     onPrecipitationClick: () -> Unit,
+    onWindClick: () -> Unit,
+    onUvIndexClick: () -> Unit,
 
     pickerState: PlacePickerState,
     searchQuery: String,
@@ -166,6 +168,8 @@ fun SummaryScreen(
                     SummaryGrid(
                         state = it,
                         onHourlyClick = onHourlySectionClick,
+                        onWindClick = onWindClick,
+                        onUvIndexClick = onUvIndexClick,
                         onDayClick = onDayClick,
                         onPrecipitationClick = onPrecipitationClick,
                         contentPadding = gridContentPadding,
@@ -205,6 +209,8 @@ private fun SummaryGrid(
     onHourlyClick: () -> Unit,
     onDayClick: (date: LocalDate) -> Unit,
     onPrecipitationClick: () -> Unit,
+    onWindClick: () -> Unit,
+    onUvIndexClick: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -238,6 +244,7 @@ private fun SummaryGrid(
         item(span = { GridItemSpan(maxLineSpan) }) {
             WindSummary(
                 state = state.wind,
+                onClick = onWindClick,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -251,6 +258,7 @@ private fun SummaryGrid(
         item {
             UvIndexSummary(
                 state = state.uvIndex,
+                onClick = onUvIndexClick,
                 modifier = Modifier.fillMaxWidth()
             )
         }

@@ -24,6 +24,7 @@ import java.time.LocalDate
 @Composable
 fun EssentialGraphsDestination(
     initialDay: LocalDate?,
+    metric: GraphMetric?,
     onSelectPlaceClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -42,6 +43,7 @@ fun EssentialGraphsDestination(
 
     EssentialGraphsScreen(
         initialDay = initialDay,
+        metric = metric,
         state = viewModel.state.collectAsState().value,
         onTryAgainClick = viewModel::getGraphs,
         onSelectPlaceClick = onSelectPlaceClick,

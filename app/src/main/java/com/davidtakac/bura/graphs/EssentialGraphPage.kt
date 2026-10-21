@@ -69,6 +69,7 @@ fun EssentialGraphPage(
     listState: LazyListState,
     contentPadding: PaddingValues,
     now: Instant,
+    metric: GraphMetric?,
     summary: TemperatureGraphSummary,
     temperatureGraph: TemperatureGraph,
     minTemp: Temperature,
@@ -91,84 +92,126 @@ fun EssentialGraphPage(
         contentPadding = contentPadding,
         modifier = Modifier.fillMaxSize()
     ) {
-        item {
-            TemperatureGraphSummary(
-                state = summary,
-                modifier = Modifier.fillMaxWidth()
-            )
+        if (metric == null || metric == GraphMetric.Temperature) {
+            item {
+                TemperatureGraphSummary(
+                    state = summary,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            item {
+                TemperatureGraph(
+                    now = now,
+                    points = temperatureGraph.points,
+                    min = minTemp,
+                    max = maxTemp,
+                    args = temperatureArgs,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(graphAspectRatio)
+                        .border(
+                            width = Dp.Hairline,
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        .clip(MaterialTheme.shapes.large)
+                )
+            }
         }
-        item {
-            TemperatureGraph(
-                now = now,
-                points = temperatureGraph.points,
-                min = minTemp,
-                max = maxTemp,
-                args = temperatureArgs,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(graphAspectRatio)
-                    .border(
-                        width = Dp.Hairline,
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+        if (metric == null || metric == GraphMetric.UvIndex) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
+                    GraphScreenSectionLabel(stringResource(R.string.cond_screen_uv_index))
+                    UvIndexGraph(
+                        state = uvIndexGraph,
+                        max = uvIndexMax,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(graphAspectRatio)
+                            .border(
+                                width = Dp.Hairline,
+                                shape = MaterialTheme.shapes.large,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            .clip(MaterialTheme.shapes.large)
                     )
-                    .clip(MaterialTheme.shapes.large)
-            )
-        }
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
-                GraphScreenSectionLabel(stringResource(R.string.cond_screen_uv_index))
-UvIndexGraph(state = uvIndexGraph, max = uvIndexMax, modifier = Modifier.fillMaxWidth().aspectRatio(graphAspectRatio).border(width = Dp.Hairline, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.onSurfaceVariant).clip(MaterialTheme.shapes.large))
-GraphScreenSectionLabel(stringResource(R.string.cond_screen_wind))
-WindGraph(state = windGraph, max = windMax, modifier = Modifier.fillMaxWidth().aspectRatio(graphAspectRatio).border(width = Dp.Hairline, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.onSurfaceVariant).clip(MaterialTheme.shapes.large))
-GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
-                PopGraph(
-                    now = now,
-                    points = popGraph.points,
-                    args = popArgs,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(graphAspectRatio)
-                        .border(
-                            width = Dp.Hairline,
-                            shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        .clip(MaterialTheme.shapes.large)
-                )
+                }
             }
         }
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
-                GraphScreenSectionLabel(stringResource(R.string.cond_screen_precip))
-                PrecipitationGraph(
-                    now = now,
-                    points = precipGraph.points,
-                    max = precipMax,
-                    args = precipArgs,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(graphAspectRatio)
-                        .border(
-                            width = Dp.Hairline,
-                            shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        .clip(MaterialTheme.shapes.large)
-                )
+        if (metric == null || metric == GraphMetric.Wind) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
+                    GraphScreenSectionLabel(stringResource(R.string.cond_screen_wind))
+                    WindGraph(
+                        state = windGraph,
+                        max = windMax,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(graphAspectRatio)
+                            .border(
+                                width = Dp.Hairline,
+                                shape = MaterialTheme.shapes.large,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            .clip(MaterialTheme.shapes.large)
+                    )
+                }
             }
         }
-        item {
-            when (precipitationTotal) {
-                is PrecipitationTotal.OtherDay -> PrecipitationBullets(
-                    state = precipitationTotal.total,
-                    modifier = Modifier.fillMaxWidth()
-                )
+        if (metric == null || metric == GraphMetric.Pop) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
+                    GraphScreenSectionLabel(stringResource(R.string.cond_screen_pop))
+                    PopGraph(
+                        now = now,
+                        points = popGraph.points,
+                        args = popArgs,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(graphAspectRatio)
+                            .border(
+                                width = Dp.Hairline,
+                                shape = MaterialTheme.shapes.large,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            .clip(MaterialTheme.shapes.large)
+                    )
+                }
+            }
+        }
+        if (metric == null || metric == GraphMetric.Precipitation) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(graphLabelSpacing)) {
+                    GraphScreenSectionLabel(stringResource(R.string.cond_screen_precip))
+                    PrecipitationGraph(
+                        now = now,
+                        points = precipGraph.points,
+                        max = precipMax,
+                        args = precipArgs,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(graphAspectRatio)
+                            .border(
+                                width = Dp.Hairline,
+                                shape = MaterialTheme.shapes.large,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            .clip(MaterialTheme.shapes.large)
+                    )
+                }
+            }
+            item {
+                when (precipitationTotal) {
+                    is PrecipitationTotal.OtherDay -> PrecipitationBullets(
+                        state = precipitationTotal.total,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                is PrecipitationTotal.Today -> TodayPrecipitationBullets(
-                    state = precipitationTotal,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    is PrecipitationTotal.Today -> TodayPrecipitationBullets(
+                        state = precipitationTotal,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
         item {

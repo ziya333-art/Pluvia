@@ -23,7 +23,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,70 +66,106 @@ import java.time.LocalDate
 @Composable
 fun EssentialGraphsScreen(
     initialDay: LocalDate?,
+    metric: GraphMetric?,
     state: EssentialGraphsState,
     onTryAgainClick: () -> Unit,
     onSelectPlaceClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.cond_screen_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_back),
-                            contentDescription = null
+    val sky = (state as? EssentialGraphsState.Success)?.backdrop
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (sky != null) {
+            Image(
+                painter = painterResource(sky.imageRes),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        MaterialTheme(
+            colorScheme = darkColorScheme(
+                surface = Color.Black.copy(alpha = 0.38f),
+                surfaceVariant = Color.Black.copy(alpha = 0.38f),
+                surfaceContainer = Color.Black.copy(alpha = 0.38f),
+                surfaceContainerHigh = Color.Black.copy(alpha = 0.38f),
+                background = Color.Transparent
+            )
+        ) {
+            Scaffold(
+                containerColor = Color.Transparent,
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                stringResource(
+                                    when (metric) {
+                                        GraphMetric.Wind -> R.string.cond_screen_wind
+                                        GraphMetric.UvIndex -> R.string.cond_screen_uv_index
+                                        GraphMetric.Pop -> R.string.cond_screen_pop
+                                        GraphMetric.Precipitation -> R.string.cond_screen_precip
+                                        else -> R.string.cond_screen_title
+                                    }
+                                )
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = onBackClick) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.arrow_back),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                }
+            ) { contentPadding ->
+                Crossfade(
+                    targetState = state,
+                    modifier = Modifier
+                        .padding(
+                            start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                            end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
+                            top = contentPadding.calculateTopPadding(),
+                        ),
+                    label = "State crossfade"
+                ) {
+                    val bottomContentPadding = contentPadding.calculateBottomPadding()
+                    val pageContentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp,
+                        bottom = bottomContentPadding + 16.dp,
+                    )
+                    when (it) {
+                        is EssentialGraphsState.Success -> Pager(
+                            state = it,
+                            initialDay = initialDay,
+                            metric = metric,
+                            pageContentPadding = pageContentPadding,
+                            modifier = Modifier.fillMaxSize()
+                        )
+
+                        EssentialGraphsState.Loading, EssentialGraphsState.Initial -> EssentialGraphsLoadingIndicator(
+                            pageContentPadding = pageContentPadding,
+                            modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize()
+                        )
+
+                        EssentialGraphsState.FailedToDownload -> FailedToDownloadErrorScreen(
+                            modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize(),
+                            onTryAgainClick = onTryAgainClick
+                        )
+
+                        EssentialGraphsState.Outdated -> OutdatedErrorScreen(
+                            modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize(),
+                            onTryAgainClick = onTryAgainClick
+                        )
+
+                        EssentialGraphsState.NoSelectedPlace -> NoSelectedPlaceErrorScreen(
+                            modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize(),
+                            onSelectPlaceClick = onSelectPlaceClick
                         )
                     }
                 }
-            )
-        }
-    ) { contentPadding ->
-        Crossfade(
-            targetState = state,
-            modifier = Modifier
-                .padding(
-                    start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
-                    end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
-                    top = contentPadding.calculateTopPadding(),
-                ),
-            label = "State crossfade"
-        ) {
-            val bottomContentPadding = contentPadding.calculateBottomPadding()
-            val pageContentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = bottomContentPadding + 16.dp,
-            )
-            when (it) {
-                is EssentialGraphsState.Success -> Pager(
-                    state = it,
-                    initialDay = initialDay,
-                    pageContentPadding = pageContentPadding,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                EssentialGraphsState.Loading, EssentialGraphsState.Initial -> EssentialGraphsLoadingIndicator(
-                    pageContentPadding = pageContentPadding,
-                    modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize()
-                )
-
-                EssentialGraphsState.FailedToDownload -> FailedToDownloadErrorScreen(
-                    modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize(),
-                    onTryAgainClick = onTryAgainClick
-                )
-
-                EssentialGraphsState.Outdated -> OutdatedErrorScreen(
-                    modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize(),
-                    onTryAgainClick = onTryAgainClick
-                )
-
-                EssentialGraphsState.NoSelectedPlace -> NoSelectedPlaceErrorScreen(
-                    modifier = Modifier.padding(bottom = bottomContentPadding).fillMaxSize(),
-                    onSelectPlaceClick = onSelectPlaceClick
-                )
             }
         }
     }
@@ -133,6 +175,7 @@ fun EssentialGraphsScreen(
 private fun Pager(
     state: EssentialGraphsState.Success,
     initialDay: LocalDate?,
+    metric: GraphMetric?,
     pageContentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -184,6 +227,7 @@ private fun Pager(
             EssentialGraphPage(
                 listState = listState,
                 contentPadding = pageContentPadding,
+                metric = metric,
                 now = tempGraphs.now,
                 summary = summaries[page],
                 temperatureGraph = tempGraphs.graphs[page],

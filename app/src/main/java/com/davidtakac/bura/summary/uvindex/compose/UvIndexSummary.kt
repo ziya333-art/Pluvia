@@ -40,9 +40,10 @@ import com.davidtakac.bura.summary.uvindex.UvIndexSummary
 import java.time.LocalTime
 
 @Composable
-fun UvIndexSummary(state: UvIndexSummary, modifier: Modifier = Modifier) {
+fun UvIndexSummary(state: UvIndexSummary, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val formatter = rememberDateTimeHourMinuteFormatter()
     SummaryTile(
+        onClick = onClick,
         label = { Text(text = stringResource(R.string.uv_index)) },
         value = { Text(text = state.now.valueString()) },
         supportingValue = { Text(text = state.now.riskString()) },
